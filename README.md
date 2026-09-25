@@ -1,6 +1,7 @@
 ﻿# Propuesta de Investigación: Sistema POS con Arquitectura PWA
 
-> **Diseño y Evaluación de un Sistema POS con Arquitectura PWA para la Sistematización de Ventas, Inventarios y Facturación Electrónica en Microempresas de Roldanillo, Valle del Cauca.**
+> **Desarrollo de un Sistema POS con Arquitectura PWA para la Sistematización y Control de Ventas e Inventario en Microempresas Locales.**
+> *Alcance Delimitado: Nivel 5 de la Taxonomía de Marzano (Síntesis / Desarrollo y Validación de Usabilidad).*
 
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
 ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
@@ -13,12 +14,14 @@
 
 ## 📌 Descripción del Proyecto
 
-Este repositorio contiene la presentación interactiva y documentación formal de la propuesta de investigación enfocada en la creación y evaluación de un **Sistema POS (Point of Sale)** bajo arquitectura **Progressive Web App (PWA)** offline-first.
+Este repositorio contiene la presentación interactiva y documentación formal de la **Ficha Inicial de la Propuesta de Investigación (P05-FT)** para el desarrollo de un **Sistema POS (Point of Sale)** con arquitectura **Progressive Web App (PWA)** offline-first.
 
-El proyecto está diseñado para responder a las necesidades críticas de las microempresas comerciales del municipio de **Roldanillo (Valle del Cauca)**, abordando:
-1. **Operación analógica y desconexión:** Reducción de tiempos de registro manual y mitigación de pérdidas de inventario.
-2. **Resiliencia ante fallos de conectividad:** Capacidad transaccional ininterrumpida mediante almacenamiento local (IndexedDB / LocalStorage) y sincronización asíncrona mediante Service Workers (Background Sync).
-3. **Cumplimiento normativo DIAN:** Preparación técnica para los requerimientos de la Resolución 000165 de 2023 sobre facturación y documento equivalente electrónico.
+### 🎯 Delimitación del Alcance (Nivel 5 Marzano)
+El proyecto se enfoca en:
+1. **Diagnóstico y Arquitectura:** Requerimientos técnicos y de usabilidad para microempresas locales.
+2. **Desarrollo de Software PWA:** Persistencia desacoplada (Service Workers + IndexedDB) y sincronización en segundo plano (Background Sync).
+3. **Validación Técnica y de Usabilidad:** Pruebas de laboratorio de latencia y evaluación de usabilidad mediante la escala psicométrica SUS (*System Usability Scale*).
+4. **Árbol del Problema Interactivo:** Visualización causal (Efectos, Problema Central y Causas) integrada en la plataforma interactiva.
 
 ---
 
@@ -27,7 +30,7 @@ El proyecto está diseñado para responder a las necesidades críticas de las mi
 ```text
 propuesta-investigacion-pos-pwa/
 ├── index.html                             # Presentación interactiva principal (PWA / Dashboard)
-├── propuesta_de_investigaci_n_pos_pwa.html # Respaldo del documento original
+├── propuesta_de_investigaci_n_pos_pwa.html # Documento con respaldo de nombre original
 ├── .gitignore                             # Reglas de exclusión de Git
 └── README.md                              # Documentación del proyecto
 ```
@@ -36,7 +39,7 @@ propuesta-investigacion-pos-pwa/
 
 ## 🚀 Visualización Local
 
-Para visualizar el panel interactivo de la propuesta en tu navegador web:
+Para visualizar el panel interactivo en tu navegador web:
 
 1. Abre directamente el archivo `index.html` en tu navegador favorito:
    ```powershell
