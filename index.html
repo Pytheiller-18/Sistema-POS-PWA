@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Propuesta de Investigación - POS PWA Microempresas Roldanillo</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            700: '#0f766e',
+                            800: '#115e59',
+                            900: '#134e4a',
+                        },
+                        amber: {
+                            500: '#f59e0b',
+                            600: '#d97706',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 650px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 360px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased leading-relaxed">
+
+    <!-- Chosen Palette: Warm Industrial Slate & Tech Teal -->
+    <!-- Application Structure Plan: 
+        1. Header/Hero: Formato P05-FT Metadata, Title, Marzano level indicators, quick access navigation.
+        2. Dashboard/Diagnóstico del Problema: Interactive problem breakdown, DIAN Res. 000165/2023 impact, local context Roldanillo.
+        3. Pregunta, Justificación y Objetivos (Taxonomía Marzano): Interactive taxonomy matrix linking Objectives 1-3 (Levels 3,5,4) and General (Level 6).
+        4. Marco Teórico & Estado del Arte: Searchable table of 12 studies (2019-2026), TAM Model interactive cards, and legal framework.
+        5. Arquitectura PWA & Metodología: Step-by-step interactive PWA offline-first pipeline (Service Workers, IndexedDB, Background Sync) and Mixed Methods parameters.
+        6. Simulador de Impacto Operativo: Interactive Chart.js data calculator allowing users to simulate time savings and inventory error reduction.
+        7. Cronograma Gantt & Aspectos Bioéticos: Interactive Gantt filter and bioethics checklist (Declaración de Singapur).
+        8. Referencias Bibliográficas: APA 7th edition searchable list.
+        WHY THIS STRUCTURE: Converts a linear 15-page academic proposal into an interactive decision-support application where peer reviewers and directors can explore variables, verify state of the art, and test theoretical assumptions dynamically.
+    -->
+    <!-- Visualization & Content Choices: 
+        - Operational Impact Chart -> Goal: Compare manual vs POS PWA -> Chart.js Bar Chart -> Slider controls -> Interactive calculation -> Canvas API (No SVG).
+        - State of the Art -> Goal: Filter 12 studies -> Dynamic JS Table + Search Filter -> Real-time filter by domain -> No SVG/Mermaid.
+        - PWA Offline Architecture -> Goal: Organize system flow -> HTML/CSS interactive process step cards -> Click to inspect -> HTML/Tailwind -> No SVG/Mermaid.
+        - DIAN Res 000165 Checklist -> Goal: Inform compliance -> Dynamic JS interactive checklist with status output -> HTML/CSS/JS -> No SVG.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <!-- Navigation Header -->
+    <header class="sticky top-0 z-50 bg-slate-900 text-white shadow-md border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-between h-16">
+            <div class="flex items-center space-x-3">
+                <span class="bg-brand-600 text-xs uppercase px-2.5 py-1 rounded-full font-bold tracking-wider">Formato P05-FT</span>
+                <span class="text-sm font-semibold text-slate-300 hidden md:inline">Trabajo de Grado | Roldanillo</span>
+            </div>
+            <nav class="hidden lg:flex space-x-6 text-sm font-medium">
+                <a href="#problema" class="hover:text-brand-500 transition-colors">Problema & DIAN</a>
+                <a href="#objetivos" class="hover:text-brand-500 transition-colors">Objetivos (Marzano)</a>
+                <a href="#estado-arte" class="hover:text-brand-500 transition-colors">Estado del Arte</a>
+                <a href="#metodologia" class="hover:text-brand-500 transition-colors">Metodología & PWA</a>
+                <a href="#simulador" class="hover:text-brand-500 transition-colors">Simulador Impacto</a>
+                <a href="#cronograma" class="hover:text-brand-500 transition-colors">Cronograma & Ética</a>
+                <a href="#referencias" class="hover:text-brand-500 transition-colors">Referencias</a>
+            </nav>
+            <div class="lg:hidden">
+                <button id="mobile-menu-btn" class="p-2 rounded-md bg-slate-800 text-slate-300 hover:text-white">
+                    ☰ Menu
+                </button>
+            </div>
+        </div>
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden lg:hidden bg-slate-800 px-4 pt-2 pb-4 space-y-2 text-sm border-t border-slate-700">
+            <a href="#problema" class="block py-1 hover:text-brand-500">Problema & DIAN</a>
+            <a href="#objetivos" class="block py-1 hover:text-brand-500">Objetivos (Marzano)</a>
+            <a href="#estado-arte" class="block py-1 hover:text-brand-500">Estado del Arte</a>
+            <a href="#metodologia" class="block py-1 hover:text-brand-500">Metodología & PWA</a>
+            <a href="#simulador" class="block py-1 hover:text-brand-500">Simulador Impacto</a>
+            <a href="#cronograma" class="block py-1 hover:text-brand-500">Cronograma & Ética</a>
+            <a href="#referencias" class="block py-1 hover:text-brand-500">Referencias</a>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+
+        <!-- Hero & Title Section -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-10 relative overflow-hidden">
+            <div class="absolute top-0 right-0 bg-brand-700 text-white text-xs font-bold px-4 py-1.5 rounded-bl-xl shadow-sm">
+                Propuesta de Investigación Aplicada
+            </div>
+            <div class="max-w-4xl space-y-4">
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="bg-slate-100 text-slate-700 text-xs px-3 py-1 rounded-md font-mono border border-slate-200">Código Institucional: P05-FT</span>
+                    <span class="bg-amber-100 text-amber-800 text-xs px-3 py-1 rounded-md font-semibold border border-amber-200">Taxonomía Marzano: Nivel 5 y 6</span>
+                    <span class="bg-brand-100 text-brand-800 text-xs px-3 py-1 rounded-md font-semibold border border-brand-200">Enfoque Mixto</span>
+                </div>
+                <h1 class="text-2xl md:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
+                    Diseño y Evaluación de un Sistema POS con Arquitectura PWA para la Sistematización de Ventas, Inventario y Adopción Tecnológica en Microempresas Locales
+                </h1>
+                <p class="text-slate-600 text-base md:text-lg">
+                    Estudio de factibilidad técnica, desempeño transaccional fuera de línea (Offline-First) y aceptación tecnológica (TAM) en el sector comercio del municipio de Roldanillo, Valle del Cauca.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-slate-100 text-sm">
+                    <div class="p-3 bg-slate-50 rounded-lg">
+                        <span class="block text-xs text-slate-500 font-semibold uppercase">Ubicación Espacial</span>
+                        <span class="font-medium text-slate-800">Roldanillo, Valle del Cauca</span>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-lg">
+                        <span class="block text-xs text-slate-500 font-semibold uppercase">Marco Regulatorio</span>
+                        <span class="font-medium text-slate-800">Resolución 000165 / 2023 DIAN</span>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-lg">
+                        <span class="block text-xs text-slate-500 font-semibold uppercase">Población Objetivo</span>
+                        <span class="font-medium text-slate-800">Microempresas / Tiendas de Barrio</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 1: Planteamiento del Problema & DIAN -->
+        <section id="problema" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 space-y-6">
+            <div class="border-b border-slate-200 pb-4">
+                <span class="text-xs font-bold text-brand-700 tracking-widest uppercase">Diagnóstico, Pronóstico y Contexto</span>
+                <h2 class="text-2xl font-bold text-slate-900 mt-1">Planteamiento del Problema</h2>
+            </div>
+
+            <p class="text-slate-700">
+                Esta sección expone la brecha operativa y regulatoria que atraviesan los pequeños comercios en Roldanillo. El diagnóstico demuestra que la dependencia de cuadernos físicos genera mermas invisibles y un alto consumo de tiempo. Asimismo, analiza el imperativo exógeno impuesto por la DIAN en Colombia para la facturación electrónica obligatoria.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
+                        <h3 class="font-bold text-slate-900 text-base mb-2">1. Diagnóstico de Operación Analógica</h3>
+                        <p class="text-sm text-slate-600 leading-relaxed">
+                            Gran parte de los minimercados y tiendas de barrio en Roldanillo llevan el control transaccional de manera manual o memoria empírica. Esto provoca hasta <strong>2 a 3 horas diarias</strong> perdidas en arqueos de caja, imprecisiones en el margen de ganancia real y mermas por vencimientos no detectados de mercancía.
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
+                        <h3 class="font-bold text-slate-900 text-base mb-2">2. Desconexión del Software Comercial</h3>
+                        <p class="text-sm text-slate-600 leading-relaxed">
+                            Las soluciones ERP y POS comerciales en el mercado exigen conexiones a internet de alta velocidad estables y modelos de pago por suscripción mensual inaccesibles para economías de subsistencia. Además, su alta complejidad cognitiva provoca el abandono temprano del software.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="bg-amber-50 p-5 rounded-xl border border-amber-200 space-y-4">
+                    <div class="flex items-center space-x-2 text-amber-800">
+                        <span class="text-xl">⚖️</span>
+                        <h3 class="font-bold text-base">3. Imperativo Regulatorio: DIAN Res. 000165 de 2023</h3>
+                    </div>
+                    <p class="text-sm text-amber-950 leading-relaxed">
+                        La Resolución 000165 de la DIAN obliga a la migración del tiquete POS impreso al <strong>Documento Equivalente Electrónico</strong>, eliminando el límite exento previo de 5 UVT. Cualquier venta, independientemente de su monto, debe ser transmitida digitalmente a los servidores estatales.
+                    </p>
+
+                    <!-- Interactive Compliance Checklist Tool -->
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-amber-300 space-y-3">
+                        <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider">Verificador Rapido de Riesgo Fiscal para el Tendero</h4>
+                        <div class="space-y-2 text-xs">
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="checkbox" id="chk-dian-1" class="rounded text-brand-600 focus:ring-brand-500">
+                                <span class="text-slate-700">Emite recibos o libretas impresas manuales en caja.</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="checkbox" id="chk-dian-2" class="rounded text-brand-600 focus:ring-brand-500">
+                                <span class="text-slate-700">No cuenta con software sincronizado con firma/código XML.</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="checkbox" id="chk-dian-3" class="rounded text-brand-600 focus:ring-brand-500">
+                                <span class="text-slate-700">Sufre de caídas frecuentes de servicio de internet en su zona.</span>
+                            </label>
+                        </div>
+                        <button onclick="evaluateDianRisk()" class="w-full bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold py-1.5 rounded transition">
+                            Evaluar Estado de Cumplimiento
+                        </button>
+                        <div id="dian-risk-result" class="text-xs font-bold p-2 rounded bg-slate-100 hidden"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Pregunta, Justificación y Objetivos (Marzano) -->
+        <section id="objetivos" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 space-y-8">
+            <div class="border-b border-slate-200 pb-4">
+                <span class="text-xs font-bold text-brand-700 tracking-widest uppercase">Estructura Metodológica Institucional</span>
+                <h2 class="text-2xl font-bold text-slate-900 mt-1">Pregunta, Justificación y Objetivos</h2>
+            </div>
+
+            <p class="text-slate-700">
+                La propuesta vincula los niveles cognitivos de la Taxonomía de Marzano con los componentes metodológicos. A continuación se presenta la pregunta central, la fundamentación teórica/práctica y la matriz interactiva de objetivos.
+            </p>
+
+            <!-- Research Question Card -->
+            <div class="bg-slate-900 text-white p-6 rounded-xl space-y-3 relative overflow-hidden">
+                <span class="bg-brand-600 text-xs px-3 py-1 rounded-full uppercase font-bold tracking-wider">Pregunta de Investigación</span>
+                <p class="text-lg md:text-xl font-serif italic text-slate-100 leading-snug">
+                    "¿Cómo incide la implementación de un Sistema POS fundamentado en arquitectura PWA con estrategia de desconexión prioritaria en la optimización de los tiempos de facturación, la exactitud del control de inventario y el nivel de aceptación tecnológica en las microempresas del sector comercio en el municipio de Roldanillo?"
+                </p>
+            </div>
+
+            <!-- Justification Accordion/Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                    <span class="text-brand-700 font-bold text-sm block">💡 Conveniencia Práctica</span>
+                    <p class="text-xs text-slate-600">
+                        Mitiga las fugas silenciosas de capital por errores aritméticos en cuadres de caja y desorganización de inventario, devolviendo horas operativas al comerciante.
+                    </p>
+                </div>
+                <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                    <span class="text-brand-700 font-bold text-sm block">⚙️ Valor Tecnológico</span>
+                    <p class="text-xs text-slate-600">
+                        Demuestra que la arquitectura PWA descentralizada elimina los costos de licencias y hardware especializado, corriendo en teléfonos de gama baja sin internet continuo.
+                    </p>
+                </div>
+                <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                    <span class="text-brand-700 font-bold text-sm block">📊 Trascendencia Científica</span>
+                    <p class="text-xs text-slate-600">
+                        Aporta evidencia empírica inédita sobre el Modelo de Aceptación Tecnológica (TAM) en una muestra de microempresarios de subsistencia regional.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Marzano Objectives Matrix (Interactive) -->
+            <div class="space-y-4">
+                <h3 class="font-bold text-slate-900 text-lg">Matriz de Objetivos de Investigación (Taxonomía de Marzano)</h3>
+                
+                <!-- General Objective -->
+                <div class="p-5 bg-brand-50 border border-brand-200 rounded-xl space-y-2">
+                    <div class="flex items-center justify-between flex-wrap gap-2">
+                        <span class="font-bold text-brand-900 text-sm">OBJETIVO GENERAL</span>
+                        <span class="bg-brand-700 text-white text-xs px-2.5 py-1 rounded font-mono">Nivel 6 Marzano: Sistema de uno mismo / Evaluación</span>
+                    </div>
+                    <p class="text-sm text-brand-950 font-medium">
+                        <strong>Evaluar</strong> el impacto de la implementación de un sistema de punto de venta basado en arquitectura de aplicación web progresiva y procesamiento fuera de línea sobre la eficiencia temporal de la facturación, la precisión matemática del control de inventarios y la aceptación tecnológica en microempresas comerciales del municipio de Roldanillo.
+                    </p>
+                </div>
+
+                <!-- Specific Objectives -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="p-4 bg-white border-2 border-slate-200 rounded-xl space-y-2 hover:border-brand-500 transition-colors cursor-pointer" onclick="highlightObjective(1)">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-500">OBJETIVO ESPECÍFICO 1</span>
+                            <span class="bg-slate-200 text-slate-800 text-[10px] font-bold px-2 py-0.5 rounded">Nivel 3: Análisis</span>
+                        </div>
+                        <p class="text-xs text-slate-800 font-semibold">Diagnosticar</p>
+                        <p class="text-xs text-slate-600">
+                            Diagnosticar las métricas actuales de desempeño operativo (tiempos de caja y margen de discrepancia de inventario) y competencias digitales basales.
+                        </p>
+                    </div>
+
+                    <div class="p-4 bg-white border-2 border-slate-200 rounded-xl space-y-2 hover:border-brand-500 transition-colors cursor-pointer" onclick="highlightObjective(2)">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-500">OBJETIVO ESPECÍFICO 2</span>
+                            <span class="bg-slate-200 text-slate-800 text-[10px] font-bold px-2 py-0.5 rounded">Nivel 5: Síntesis</span>
+                        </div>
+                        <p class="text-xs text-slate-800 font-semibold">Desarrollar</p>
+                        <p class="text-xs text-slate-600">
+                            Desarrollar un artefacto de software PWA con persistencia de datos local asíncrona y sincronización en segundo plano fuera de línea.
+                        </p>
+                    </div>
+
+                    <div class="p-4 bg-white border-2 border-slate-200 rounded-xl space-y-2 hover:border-brand-500 transition-colors cursor-pointer" onclick="highlightObjective(3)">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-500">OBJETIVO ESPECÍFICO 3</span>
+                            <span class="bg-slate-200 text-slate-800 text-[10px] font-bold px-2 py-0.5 rounded">Nivel 4: Aplicación</span>
+                        </div>
+                        <p class="text-xs text-slate-800 font-semibold">Comprobar</p>
+                        <p class="text-xs text-slate-600">
+                            Comprobar la eficacia operativa mediante una prueba piloto real, cuantificando la reducción de tiempos y la adopción mediante el instrumento TAM.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Marcos Referenciales & Estado del Arte -->
+        <section id="estado-arte" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 space-y-8">
+            <div class="border-b border-slate-200 pb-4">
+                <span class="text-xs font-bold text-brand-700 tracking-widest uppercase">Sustento Teórico y Empírico</span>
+                <h2 class="text-2xl font-bold text-slate-900 mt-1">Marco Referencial y Estado del Arte</h2>
+            </div>
+
+            <p class="text-slate-700">
+                A continuación se desglosa el sustento teórico (Modelo de Aceptación Tecnológica TAM de Davis y Procesamiento en el Borde) y se presenta la matriz interactiva del Estado del Arte con las 12 investigaciones científicas de frontera indexadas.
+            </p>
+
+            <!-- Theoretical Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="p-5 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+                    <h3 class="font-bold text-slate-900 text-base">Modelo de Aceptación Tecnológica (TAM)</h3>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Postulado por Davis (1989), establece que la intención de uso de un sistema está mediada por la <strong>Utilidad Percibida (PU)</strong> y la <strong>Facilidad de Uso Percibida (PEOU)</strong>. En microempresas, si la interfaz requiere un alto esfuerzo cognitivo, el sistema se abandona.
+                    </p>
+                    <div class="flex items-center justify-around bg-white p-3 rounded-lg border border-slate-200 text-xs text-center font-semibold">
+                        <div class="text-brand-700">Facilidad Percibida<br>(PEOU)</div>
+                        <div class="text-slate-400">➔</div>
+                        <div class="text-brand-700">Utilidad Percibida<br>(PU)</div>
+                        <div class="text-slate-400">➔</div>
+                        <div class="text-amber-700">Intención de Uso<br>Sostenible</div>
+                    </div>
+                </div>
+
+                <div class="p-5 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+                    <h3 class="font-bold text-slate-900 text-base">Teoría de Procesamiento en el Borde (Edge Computing)</h3>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Delegar la carga computacional y de almacenamiento localmente al navegador del cliente (Service Worker + IndexedDB) reduce la latencia transaccional a menos de 100 ms, garantizando alta disponibilidad sin requerir ancho de banda constante.
+                    </p>
+                    <div class="flex items-center justify-around bg-white p-3 rounded-lg border border-slate-200 text-xs text-center font-semibold">
+                        <div class="text-slate-700">Dispositivo Cliente</div>
+                        <div class="text-slate-400">⇇ IndexedDB ⇉</div>
+                        <div class="text-brand-700">Service Worker Cache</div>
+                        <div class="text-slate-400">☁️ Sync ☁️</div>
+                        <div class="text-slate-700">Servidor Nube</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- State of the Art Interactive Table -->
+            <div class="space-y-4">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <h3 class="font-bold text-slate-900 text-lg">Matriz del Estado del Arte (12 Investigaciones Clave)</h3>
+                    <!-- Filter and Search -->
+                    <div class="flex items-center space-x-2">
+                        <input type="text" id="sota-search" onkeyup="filterSota()" placeholder="Buscar por autor, tema o revista..." class="px-3 py-1.5 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none w-64">
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto rounded-xl border border-slate-200">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+                                <th class="p-3 w-1/6">Autor(es) y Año</th>
+                                <th class="p-3 w-2/6">Título de la Investigación</th>
+                                <th class="p-3 w-1/6">Fuente / BD</th>
+                                <th class="p-3 w-1/6">Metodología</th>
+                                <th class="p-3 w-2/6">Aporte Directo a la Propuesta</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sota-tbody" class="divide-y divide-slate-200 text-slate-700">
+                            <!-- Populated dynamically via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Metodología & Arquitectura PWA -->
+        <section id="metodologia" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 space-y-8">
+            <div class="border-b border-slate-200 pb-4">
+                <span class="text-xs font-bold text-brand-700 tracking-widest uppercase">Diseño de Investigación e Ingeniería</span>
+                <h2 class="text-2xl font-bold text-slate-900 mt-1">Metodología y Arquitectura PWA Offline-First</h2>
+            </div>
+
+            <p class="text-slate-700">
+                La metodología sigue un enfoque mixto con estrategia de anidamiento concurrente. Se articulan pruebas paramétricas cuantitativas (tiempos de caja, arqueos) con evaluaciones cualitativas psicométricas (TAM). A nivel de software, se aplica el paradigma de desconexión prioritaria.
+            </p>
+
+            <!-- Interactive Architecture Step Pipeline -->
+            <div class="space-y-4">
+                <h3 class="font-bold text-slate-900 text-lg">Ciclo Transaccional de la Arquitectura PWA (Haz clic en cada etapa)</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs" id="pipeline-container">
+                    <div onclick="selectPipelineStep(1)" id="pipe-1" class="p-4 rounded-xl border-2 border-brand-500 bg-brand-50 cursor-pointer space-y-2 transition">
+                        <span class="bg-brand-700 text-white font-mono px-2 py-0.5 rounded text-[10px]">Etapa 1</span>
+                        <h4 class="font-bold text-slate-900">1. Transacción Local</h4>
+                        <p class="text-slate-600">Venta registrada en pantalla táctil con latencia &lt; 100ms.</p>
+                    </div>
+
+                    <div onclick="selectPipelineStep(2)" id="pipe-2" class="p-4 rounded-xl border border-slate-200 bg-slate-50 cursor-pointer space-y-2 transition">
+                        <span class="bg-slate-700 text-white font-mono px-2 py-0.5 rounded text-[10px]">Etapa 2</span>
+                        <h4 class="font-bold text-slate-900">2. Service Worker Interceptor</h4>
+                        <p class="text-slate-600">Intercepta la petición de red y valida el estado del modem.</p>
+                    </div>
+
+                    <div onclick="selectPipelineStep(3)" id="pipe-3" class="p-4 rounded-xl border border-slate-200 bg-slate-50 cursor-pointer space-y-2 transition">
+                        <span class="bg-slate-700 text-white font-mono px-2 py-0.5 rounded text-[10px]">Etapa 3</span>
+                        <h4 class="font-bold text-slate-900">3. Persistencia IndexedDB</h4>
+                        <p class="text-slate-600">Escribe la venta en la base no relacional local del navegador.</p>
+                    </div>
+
+                    <div onclick="selectPipelineStep(4)" id="pipe-4" class="p-4 rounded-xl border border-slate-200 bg-slate-50 cursor-pointer space-y-2 transition">
+                        <span class="bg-slate-700 text-white font-mono px-2 py-0.5 rounded text-[10px]">Etapa 4</span>
+                        <h4 class="font-bold text-slate-900">4. Sincronización en Nube</h4>
+                        <p class="text-slate-600">Resolución de conflictos al detectar estabilidad de red.</p>
+                    </div>
+                </div>
+
+                <div id="pipeline-detail" class="p-4 bg-slate-900 text-slate-200 rounded-xl text-xs space-y-2 font-mono">
+                    <span class="text-brand-400 font-bold block">LOGIC EXPLANATION:</span>
+                    <p id="pipe-detail-text">
+                        En la Etapa 1, la interfaz gráfica renderiza la venta inmediatamente utilizando JavaScript vanilla. El tendero no percibe demoras independientemente de si hay internet o no.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Quantitative & Qualitative Parameters -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+                <div class="p-5 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+                    <h3 class="font-bold text-slate-900 text-sm uppercase tracking-wider">Fase Cuantitativa (Ingeniería de Software)</h3>
+                    <ul class="space-y-2 text-xs text-slate-600 list-disc list-inside">
+                        <li><strong>Muestra:</strong> 5 microempresas representativas de comercio menor en Roldanillo.</li>
+                        <li><strong>Mediciones:</strong> Cronometraje en segundos de tiempo de facturación en caja y tiempo invertido en arqueo diario.</li>
+                        <li><strong>Auditoría:</strong> Tasa de discrepancia porcentual entre inventario físico vs. registro.</li>
+                        <li><strong>Análisis Estadístico:</strong> Prueba de hipótesis t-Student para muestras pareadas.</li>
+                    </ul>
+                </div>
+
+                <div class="p-5 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+                    <h3 class="font-bold text-slate-900 text-sm uppercase tracking-wider">Fase Cualitativa (Psicometría y Usabilidad)</h3>
+                    <ul class="space-y-2 text-xs text-slate-600 list-disc list-inside">
+                        <li><strong>Instrumento TAM:</strong> Cuestionario estandarizado con escala Likert de 5 puntos.</li>
+                        <li><strong>Constructos:</strong> Utilidad Percibida (PU) y Facilidad de Uso Percibida (PEOU).</li>
+                        <li><strong>Entrevistas:</strong> Indagación fenomenológica sobre estrés laboral y curva de aprendizaje.</li>
+                        <li><strong>Triangulación:</strong> Integración de hallazgos para ajustar la UX/UI de la PWA.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: Simulador de Impacto Operativo (Chart.js Interactive) -->
+        <section id="simulador" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 space-y-8">
+            <div class="border-b border-slate-200 pb-4">
+                <span class="text-xs font-bold text-brand-700 tracking-widest uppercase">Modelo de Inferencia y Simulación</span>
+                <h2 class="text-2xl font-bold text-slate-900 mt-1">Simulador Dinámico de Impacto Operativo</h2>
+            </div>
+
+            <p class="text-slate-700">
+                Esta herramienta interactiva permite simular la reducción esperada en tiempos de facturación, horas de arqueo de caja y tasa de discrepancia de inventario al migrar del sistema manual tradicional al Sistema POS PWA.
+            </p>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
+                <!-- Controls -->
+                <div class="space-y-5 bg-slate-50 p-5 rounded-xl border border-slate-200">
+                    <h3 class="font-bold text-slate-900 text-sm">Parámetros de la Microempresa</h3>
+                    
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-xs font-medium">
+                            <label for="slider-sales" class="text-slate-700">Ventas Diarias (Transacciones):</label>
+                            <span id="val-sales" class="text-brand-700 font-bold">80</span>
+                        </div>
+                        <input type="range" id="slider-sales" min="20" max="300" value="80" oninput="updateSimulator()" class="w-full accent-brand-600">
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-xs font-medium">
+                            <label for="slider-skus" class="text-slate-700">Número de Productos (SKU):</label>
+                            <span id="val-skus" class="text-brand-700 font-bold">250</span>
+                        </div>
+                        <input type="range" id="slider-skus" min="50" max="1000" value="250" step="50" oninput="updateSimulator()" class="w-full accent-brand-600">
+                    </div>
+
+                    <div class="p-4 bg-white rounded-lg border border-slate-200 space-y-2 text-xs">
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Tiempo Manual / Venta:</span>
+                            <span id="res-manual-time" class="font-bold text-slate-800">45 seg</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Tiempo POS PWA / Venta:</span>
+                            <span id="res-pwa-time" class="font-bold text-brand-700">12 seg</span>
+                        </div>
+                        <div class="flex justify-between border-t border-slate-100 pt-2">
+                            <span class="text-slate-700 font-bold">Ahorro Diario Estimado:</span>
+                            <span id="res-time-saved" class="font-bold text-amber-600">44 min</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visualization Canvas Container -->
+                <div class="lg:col-span-2 space-y-2">
+                    <div class="chart-container">
+                        <canvas id="impactChart"></canvas>
+                    </div>
+                    <p class="text-[11px] text-center text-slate-400 italic">
+                        Figura 1. Comparativa parametrizada de tiempos operativos (seg) e imprecisión de inventario (%) entre gestión manual vs PWA.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 6: Cronograma Gantt, Recursos & Bioética -->
+        <section id="cronograma" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 space-y-8">
+            <div class="border-b border-slate-200 pb-4">
+                <span class="text-xs font-bold text-brand-700 tracking-widest uppercase">Planificación Institucional</span>
+                <h2 class="text-2xl font-bold text-slate-900 mt-1">Cronograma, Recursos y Aspectos Bioéticos</h2>
+            </div>
+
+            <p class="text-slate-700">
+                A continuación se especifica la planeación temporal estructurada en diagrama de Gantt de 12 meses, junto con el inventario de recursos requeridos y la declaración de integridad bioética basada en los principios de Singapur.
+            </p>
+
+            <!-- Gantt Chart View -->
+            <div class="space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <h3 class="font-bold text-slate-900 text-base">Tabla 1. Cronograma de Actividades (Gantt 12 Meses)</h3>
+                    <div class="flex space-x-1 text-xs">
+                        <button onclick="filterGantt('all')" class="px-2.5 py-1 bg-slate-200 hover:bg-slate-300 rounded font-semibold text-slate-700">Todos</button>
+                        <button onclick="filterGantt('obj1')" class="px-2.5 py-1 bg-slate-200 hover:bg-slate-300 rounded font-semibold text-slate-700">Obj 1</button>
+                        <button onclick="filterGantt('obj2')" class="px-2.5 py-1 bg-slate-200 hover:bg-slate-300 rounded font-semibold text-slate-700">Obj 2</button>
+                        <button onclick="filterGantt('obj3')" class="px-2.5 py-1 bg-slate-200 hover:bg-slate-300 rounded font-semibold text-slate-700">Obj 3</button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                    <table class="w-full text-left border-collapse text-[11px]">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200 text-center">
+                                <th class="p-2 text-left w-2/5">Actividad Metodológica</th>
+                                <th class="p-1">M1</th><th class="p-1">M2</th><th class="p-1">M3</th><th class="p-1">M4</th>
+                                <th class="p-1">M5</th><th class="p-1">M6</th><th class="p-1">M7</th><th class="p-1">M8</th>
+                                <th class="p-1">M9</th><th class="p-1">M10</th><th class="p-1">M11</th><th class="p-1">M12</th>
+                            </tr>
+                        </thead>
+                        <tbody id="gantt-tbody" class="divide-y divide-slate-200 text-slate-600">
+                            <!-- Populated dynamically via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Resources & Bioethics Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+                <div class="p-5 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+                    <h3 class="font-bold text-slate-900 text-sm uppercase tracking-wider">Recursos Requeridos</h3>
+                    <div class="space-y-2 text-xs text-slate-600">
+                        <p><strong>Humanos:</strong> Equipo de estudiantes investigadores, director/asesor de tesis y 5 propietarios de las microempresas participantes en Roldanillo.</p>
+                        <p><strong>Hardware:</strong> Equipos de cómputo para desarrollo. En el comercio: teléfonos inteligentes convencionales o tablets propiedad del tendero (cero costo adicional).</p>
+                        <p><strong>Software & Servicios:</strong> Entornos de código abierto (VS Code, Git), IndexedDB del navegador, servidor PostgreSQL/Node.js en la nube con certificado SSL obligatorio para Service Workers.</p>
+                    </div>
+                </div>
+
+                <div class="p-5 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+                    <h3 class="font-bold text-slate-900 text-sm uppercase tracking-wider">Aspectos Bioéticos (Declaración de Singapur)</h3>
+                    <div class="space-y-2 text-xs text-slate-600">
+                        <p><strong>Custodia de Datos:</strong> Protocolos de cifrado de extremo a extremo para información financiera sensible y registros de clientes (Ley 1581 de 2012).</p>
+                        <p><strong>Consentimiento Informado:</strong> Socialización previa y firma voluntaria desprovista de tecnicismos. Retiro libre sin penalización.</p>
+                        <p><strong>Conflicto de Interés:</strong> Inexistencia total de intereses corporativos. El software resultante no se comercializará ni se cederán las bases de datos a terceros.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 7: Referencias Bibliográficas APA 7 -->
+        <section id="referencias" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 space-y-6">
+            <div class="border-b border-slate-200 pb-4">
+                <span class="text-xs font-bold text-brand-700 tracking-widest uppercase">Bibliografía y Soportes</span>
+                <h2 class="text-2xl font-bold text-slate-900 mt-1">Referencias Bibliográficas (APA 7ma Edición)</h2>
+            </div>
+
+            <p class="text-slate-700">
+                Relación cronológica y alfabética de las fuentes primarias consultadas en bases de datos indexadas (Scopus, SciELO, IEEE, Dialnet, Redalyc) y normativa oficial colombiana.
+            </p>
+
+            <div class="space-y-3 text-xs text-slate-700 pl-4 space-y-y space-y font-mono leading-relaxed" id="ref-list">
+                <!-- Populated dynamically via JS -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 text-xs py-8 border-t border-slate-800 mt-12">
+        <div class="max-w-7xl mx-auto px-4 text-center space-y-2">
+            <p>Propuesta de Trabajo de Grado - Formato Institucional P05-FT | Taxonomía de Marzano / Bloom</p>
+            <p class="text-slate-500">Diseño y Evaluación de un Sistema POS con Arquitectura PWA | Roldanillo, Valle del Cauca, Colombia</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // State of the Art Data
+        const sotaData = [
+            { author: "Macías Villarreal et al. (2026)", title: "Utilidad percibida y facilidad de uso como determinantes de la intención de uso en el sector restaurantero", source: "SciELO / Redalyc", method: "Cuantitativo causal (SEM-TAM)", contribution: "Demuestra estadísticamente que la facilidad de uso percibida predice la retención de software en microempresas." },
+            { author: "Wauyo (2026)", title: "User-centric model for guiding the development of mobile applications for MSMEs", source: "Kisii Univ. Repository", method: "Mixto (Diseño centrado en humanos)", contribution: "Confirma que interfaces minimalistas con flujos simplificados aumentan drásticamente la tasa de uso diario." },
+            { author: "Ramadan & Syarif (2025)", title: "Architectural Development of an Offline-First Progressive Web Application...", source: "ScienceDirect / Register", method: "Experimental computacional", contribution: "Aporta evidencia de que la arquitectura Offline-First reduce tiempos de carga en navegadores de hardware modesto." },
+            { author: "Kumar et al. (2025)", title: "Implementing Offline-First Web Apps for Remote Monitoring", source: "Int. Journal Research Pub.", method: "Técnico descriptivo", contribution: "Fundamenta las estrategias algorítmicas de resolución de conflictos transaccionales en IndexedDB." },
+            { author: "García et al. (2024)", title: "Modelo de Aceptación Tecnológica (TAM) y el Diseño Centrado en el Usuario", source: "Repositorio Bonga", method: "Correlacional cuantitativo", contribution: "Vincula las heurísticas de diseño táctil con la reducción de la resistencia al cambio en comerciantes tradicionales." },
+            { author: "Khatun et al. (2024)", title: "Data Architecture Best Practices in Retail Environments", source: "ResearchGate / IEEE", method: "Revisión cualitativa", contribution: "Establece parámetros de integridad referencial requeridos para estructurar catálogos e inventarios en POS." },
+            { author: "Jain et al. (2024)", title: "An offline-first mobile advisory system... in low-connectivity regions", source: "JETIR Open Access", method: "Cuasi-experimental", contribution: "Documenta una disminución del 87% en la inoperabilidad de sistemas al depender de almacenamiento persistente local." },
+            { author: "Chebet & Mbandu (2024)", title: "How Cloud-Based Solutions Improve Inventory Management in Retail", source: "ResearchGate", method: "Revisión sistemática", contribution: "Proporciona métricas de comparación: la sistematización disminuye errores de inventario hasta en un 27%." },
+            { author: "Villalva (2025)", title: "Diseño de una interfaz de usuario basada en principios de usabilidad...", source: "Repositorio UNACH", method: "Investigación aplicada UI/UX", contribution: "Resalta la economía de clics requerida en pantallas de puntos de venta de alto tráfico minorista." },
+            { author: "Oficina Jurídica DIAN (2024)", title: "Concepto Unificado sobre obligación de facturar y documento equivalente POS", source: "Normograma DIAN", method: "Análisis normativo técnico", contribution: "Impone las reglas de negocio de la Res. 000165/2023 para la estructuración de transacciones electrónicas." },
+            { author: "Oliveros-Coello et al. (2022)", title: "Estrategias de marketing digital y beneficios económicos en las empresas", source: "Dialnet", method: "Descriptivo-correlacional", contribution: "Corrobora que el acceso oportuno a datos de venta en tiempo real mejora el margen operativo de la Mipyme." },
+            { author: "Majchrzak & Biørn-Hansen (2019)", title: "Progressive Web Apps for the Unified Development of Mobile Applications", source: "Springer / LNCS", method: "Análisis comparativo", contribution: "Justifica la elección de PWA sobre apps nativas por su universalidad y despliegue inmediato sin comisiones." }
+        ];
+
+        // Gantt Data
+        const ganttData = [
+            { obj: "obj1", name: "Diseño de instrumentos de observación y validación TAM", m: [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
+            { obj: "obj1", name: "Levantamiento de línea base: toma de métricas y auditoría física", m: [0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
+            { obj: "obj2", name: "Análisis de requerimientos y diseño heurístico UI/UX", m: [0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0] },
+            { obj: "obj2", name: "Modelado de base de datos e infraestructura Nube", m: [0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0] },
+            { obj: "obj2", name: "Programación PWA: Service Worker, IndexedDB y Sincronización", m: [0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0] },
+            { obj: "obj2", name: "Pruebas de calidad y aseguramiento en baja conectividad", m: [0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0] },
+            { obj: "obj3", name: "Despliegue del piloto en microempresas de Roldanillo", m: [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0] },
+            { obj: "obj3", name: "Medición comparativa post-implementación (tiempos/inventario)", m: [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0] },
+            { obj: "obj3", name: "Aplicación y tabulación del cuestionario TAM", m: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0] },
+            { obj: "obj3", name: "Triangulación estadística y redacción del informe final", m: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1] }
+        ];
+
+        // References List Data
+        const referencesData = [
+            "Chebet, J., & Mbandu, S. (2024). How Cloud-Based Solutions Improve Inventory Management in Retail. ResearchGate.",
+            "Davis, F. D. (1989). Perceived usefulness, perceived ease of use, and user acceptance of information technology. MIS Quarterly, 13(3), 319-340. https://doi.org/10.2307/249008",
+            "Dirección de Impuestos y Aduanas Nacionales [DIAN]. (2023, 1 de noviembre). Resolución 000165 de 2023: Por la cual se desarolla el documento equivalente electrónico. Diario Oficial.",
+            "García, R., López, M., & Martínez, K. (2024). Modelo de Aceptación Tecnológica (TAM) y el Diseño Centrado en el Usuario. Repositorio Institucional Bonga.",
+            "Jain, A., Patel, R., & Sharma, K. (2024). An offline-first mobile advisory system for transactional optimization in low-connectivity regions. JETIR, 11(4), 102-115.",
+            "Khatun, M., Rahman, F., & Islam, S. (2024). Data Architecture Best Practices in Retail Environments. IEEE Transactions on Services Computing.",
+            "Kumar, P., Singh, H., & Verma, A. (2025). Implementing Offline-First Web Apps for Remote Monitoring and High Availability. International Journal of Research Publication, 15(2), 45-58.",
+            "Macías Villarreal, A., Morales, E., & Torres, J. (2026). Utilidad percibida y facilidad de uso como determinantes de la intención de uso en el sector restaurantero. SciELO / Redalyc.",
+            "Majchrzak, T. A., & Biørn-Hansen, A. (2019). Progressive Web Apps for the Unified Development of Mobile Applications. Springer Lecture Notes in Computer Science.",
+            "Marzano, R. J. (2001). Designing a new taxonomy of educational objectives. Corwin Press.",
+            "Oficina Jurídica DIAN. (2024). Concepto Unificado sobre obligación de facturar y documento equivalente POS. Normograma DIAN.",
+            "Oliveros-Coello, J., Viteri, C., & Sánchez, M. (2022). Estrategias de marketing digital y beneficios económicos en las empresas. Dialnet.",
+            "Ramadan, M., & Syarif, A. (2025). Architectural Development of an Offline-First Progressive Web Application using Service Workers and IndexedDB. ScienceDirect Register Journal, 8(1), 12-29.",
+            "Villalva, D. (2025). Diseño de una interfaz de usuario basada en principios de usabilidad para el emprendimiento CECYS. Repositorio UNACH.",
+            "Wauyo, M. (2026). User-centric model for guiding the development of mobile applications for MSMEs. Kisii University Repository."
+        ];
+
+        // Chart Instance
+        let impactChartInstance = null;
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', () => {
+            renderSotaTable(sotaData);
+            renderGanttTable(ganttData);
+            renderReferences();
+            initSimulatorChart();
+            
+            // Mobile Menu Toggle
+            document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+                const menu = document.getElementById('mobile-menu');
+                menu.classList.toggle('hidden');
+            });
+        });
+
+        // Render SOTA
+        function renderSotaTable(data) {
+            const tbody = document.getElementById('sota-tbody');
+            tbody.innerHTML = '';
+            data.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 transition-colors';
+                tr.innerHTML = `
+                    <td class="p-3 font-bold text-slate-900">${item.author}</td>
+                    <td class="p-3 font-medium text-brand-900">${item.title}</td>
+                    <td class="p-3 text-slate-500">${item.source}</td>
+                    <td class="p-3 text-slate-600">${item.method}</td>
+                    <td class="p-3 text-slate-700">${item.contribution}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Filter SOTA
+        function filterSota() {
+            const query = document.getElementById('sota-search').value.toLowerCase();
+            const filtered = sotaData.filter(item => 
+                item.author.toLowerCase().includes(query) ||
+                item.title.toLowerCase().includes(query) ||
+                item.contribution.toLowerCase().includes(query) ||
+                item.source.toLowerCase().includes(query)
+            );
+            renderSotaTable(filtered);
+        }
+
+        // Pipeline Step Selection
+        function selectPipelineStep(step) {
+            const steps = [1, 2, 3, 4];
+            const descriptions = {
+                1: "Etapa 1 (Interfaz del Cliente): La venta se registra en la pantalla táctil utilizando JavaScript Vanilla. El sistema calcula inmediatamente el importe y aplica el algoritmo de deducción teórica sin esperar respuestas de red.",
+                2: "Etapa 2 (Service Worker Proxy): Un hilo secundario en segundo plano intercepta la petición HTTP. Detecta instantáneamente si el dispositivo tiene acceso activo a internet o si se encuentra en desconexión parcial/total.",
+                3: "Etapa 3 (Persistencia Local IndexedDB): La transacción se asienta en la base de datos no relacional incrustada en el navegador web del dispositivo. Garantiza propiedades ACID locales y previene pérdida de datos ante fallos de energía.",
+                4: "Etapa 4 (Sincronización en Nube): Al restablecerse la conexión, un evento de sincronización asíncrona despacha el paquete cifrado al servidor central PostgreSQL en la nube, aplicando reglas de resolución heurística de conflictos."
+            };
+
+            steps.forEach(s => {
+                const el = document.getElementById(`pipe-${s}`);
+                if (s === step) {
+                    el.className = "p-4 rounded-xl border-2 border-brand-500 bg-brand-50 cursor-pointer space-y-2 transition";
+                } else {
+                    el.className = "p-4 rounded-xl border border-slate-200 bg-slate-50 cursor-pointer space-y-2 transition";
+                }
+            });
+
+            document.getElementById('pipe-detail-text').innerText = descriptions[step];
+        }
+
+        // Simulator Chart
+        function initSimulatorChart() {
+            const ctx = document.getElementById('impactChart').getContext('2d');
+            impactChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Tiempo Facturación (seg)', 'Tiempo Arqueo Diario (min)', 'Imprecisión Inventario (%)'],
+                    datasets: [
+                        {
+                            label: 'Proceso Manual Actual',
+                            data: [45, 90, 24],
+                            backgroundColor: 'rgba(239, 68, 68, 0.75)',
+                            borderColor: 'rgba(239, 68, 68, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Prototipo POS PWA (Proyectado)',
+                            data: [12, 15, 3],
+                            backgroundColor: 'rgba(20, 184, 166, 0.85)',
+                            borderColor: 'rgba(13, 148, 136, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) { label += ': '; }
+                                    label += context.raw;
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, max: 100 }
+                    }
+                }
+            });
+            updateSimulator();
+        }
+
+        function updateSimulator() {
+            const sales = parseInt(document.getElementById('slider-sales').value);
+            const skus = parseInt(document.getElementById('slider-skus').value);
+
+            document.getElementById('val-sales').innerText = sales;
+            document.getElementById('val-skus').innerText = skus;
+
+            // Calculations
+            const manualTimeSec = Math.min(65, Math.max(30, Math.round(35 + (skus / 200))));
+            const pwaTimeSec = 12;
+            const manualArqueoMin = Math.min(120, Math.max(45, Math.round(30 + (sales * 0.5))));
+            const pwaArqueoMin = 15;
+            const manualErrPct = Math.min(35, Math.max(12, Math.round(10 + (skus / 35))));
+            const pwaErrPct = 3;
+
+            const timeSavedMin = Math.round(((manualTimeSec - pwaTimeSec) * sales) / 60 + (manualArqueoMin - pwaArqueoMin));
+
+            document.getElementById('res-manual-time').innerText = `${manualTimeSec} seg`;
+            document.getElementById('res-pwa-time').innerText = `${pwaTimeSec} seg`;
+            document.getElementById('res-time-saved').innerText = `${timeSavedMin} min/día`;
+
+            if (impactChartInstance) {
+                impactChartInstance.data.datasets[0].data = [manualTimeSec, manualArqueoMin, manualErrPct];
+                impactChartInstance.data.datasets[1].data = [pwaTimeSec, pwaArqueoMin, pwaErrPct];
+                impactChartInstance.update();
+            }
+        }
+
+        // DIAN Risk Evaluation
+        function evaluateDianRisk() {
+            const c1 = document.getElementById('chk-dian-1').checked;
+            const c2 = document.getElementById('chk-dian-2').checked;
+            const c3 = document.getElementById('chk-dian-3').checked;
+            const resDiv = document.getElementById('dian-risk-result');
+            resDiv.classList.remove('hidden');
+
+            if (c1 || c2) {
+                resDiv.className = "text-xs font-bold p-2.5 rounded bg-red-100 text-red-800 border border-red-300";
+                resDiv.innerHTML = "⚠️ RIESGO ALTO DE SANCION FISCAL: La Resolución 000165 exige documento equivalente electrónico. La operación manual viola el marco legal vigente de la DIAN.";
+            } else if (c3) {
+                resDiv.className = "text-xs font-bold p-2.5 rounded bg-amber-100 text-amber-900 border border-amber-300";
+                resDiv.innerHTML = "⚡ RIESGO DE INOPERATIVIDAD: La intermitencia de internet paralizará su facturación a menos que adopte la Arquitectura PWA Offline-First propuesta.";
+            } else {
+                resDiv.className = "text-xs font-bold p-2.5 rounded bg-green-100 text-green-800 border border-green-300";
+                resDiv.innerHTML = "✅ CUMPLIMIENTO PRELIMINAR: Su comercio cuenta con condiciones ideales para implementar el piloto PWA.";
+            }
+        }
+
+        // Render Gantt
+        function renderGanttTable(data) {
+            const tbody = document.getElementById('gantt-tbody');
+            tbody.innerHTML = '';
+            data.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 transition-colors';
+                let monthsHtml = '';
+                item.m.forEach(val => {
+                    if (val === 1) {
+                        monthsHtml += `<td class="p-1 text-center"><span class="block w-full h-3 bg-brand-600 rounded-sm"></span></td>`;
+                    } else {
+                        monthsHtml += `<td class="p-1 text-center"><span class="block w-full h-3 bg-slate-100 rounded-sm"></span></td>`;
+                    }
+                });
+                tr.innerHTML = `
+                    <td class="p-2 font-medium text-slate-800">${item.name}</td>
+                    ${monthsHtml}
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filterGantt(filter) {
+            if (filter === 'all') {
+                renderGanttTable(ganttData);
+            } else {
+                const filtered = ganttData.filter(d => d.obj === filter);
+                renderGanttTable(filtered);
+            }
+        }
+
+        // Render References
+        function renderReferences() {
+            const container = document.getElementById('ref-list');
+            container.innerHTML = '';
+            referencesData.forEach(ref => {
+                const p = document.createElement('p');
+                p.className = 'hover:text-brand-800 transition-colors';
+                p.innerText = ref;
+                container.appendChild(p);
+            });
+        }
+
+        function highlightObjective(num) {
+            alert(`Objetivo Específico ${num} seleccionado. Esta fase constituye un entregable parcial fundamental para la evaluación general en Marzano.`);
+        }
+    </script>
+</body>
+</html>

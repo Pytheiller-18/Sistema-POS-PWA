@@ -1,0 +1,25 @@
+﻿# .gitignore
+
+# Archivos de sistema operativo
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+# Dependencias y entornos
+node_modules/
+dist/
+build/
+.env
+.env.local
+*.log
+
+# IDEs
+.vscode/
+.idea/
