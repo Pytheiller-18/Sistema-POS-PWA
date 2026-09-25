@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es" class="scroll-smooth">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -41,14 +42,17 @@
             height: 320px;
             max-height: 400px;
         }
+
         @media (min-width: 768px) {
             .chart-container {
                 height: 360px;
             }
         }
+
         .tree-line {
             position: relative;
         }
+
         .tree-line::before {
             content: '';
             position: absolute;
@@ -61,6 +65,7 @@
         }
     </style>
 </head>
+
 <body class="bg-slate-50 text-slate-800 font-sans antialiased leading-relaxed">
 
     <!-- Chosen Palette: Warm Technical Slate & Teal with Coral Warning Accents -->
@@ -89,7 +94,8 @@
     <header class="sticky top-0 z-50 bg-slate-900 text-white shadow-md border-b border-slate-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-between h-16">
             <div class="flex items-center space-x-3">
-                <span class="bg-brand-600 text-xs uppercase px-2.5 py-1 rounded-full font-bold tracking-wider">Formato P05-FT</span>
+                <span class="bg-brand-600 text-xs uppercase px-2.5 py-1 rounded-full font-bold tracking-wider">Formato
+                    P05-FT</span>
                 <span class="text-xs md:text-sm font-semibold text-slate-300">Ficha Inicial | Nivel 5 Marzano</span>
             </div>
             <nav class="hidden lg:flex space-x-6 text-sm font-medium">
@@ -103,13 +109,15 @@
                 <a href="#referencias" class="hover:text-brand-500 transition-colors">Referencias</a>
             </nav>
             <div class="lg:hidden">
-                <button id="mobile-menu-btn" class="p-2 rounded-md bg-slate-800 text-slate-300 hover:text-white text-xs">
+                <button id="mobile-menu-btn"
+                    class="p-2 rounded-md bg-slate-800 text-slate-300 hover:text-white text-xs">
                     ☰ Menú
                 </button>
             </div>
         </div>
         <!-- Mobile menu -->
-        <div id="mobile-menu" class="hidden lg:hidden bg-slate-800 px-4 pt-2 pb-4 space-y-2 text-xs border-t border-slate-700">
+        <div id="mobile-menu"
+            class="hidden lg:hidden bg-slate-800 px-4 pt-2 pb-4 space-y-2 text-xs border-t border-slate-700">
             <a href="#ficha-inicial" class="block py-1 hover:text-brand-500">Ficha Inicial</a>
             <a href="#arbol-problema" class="block py-1 hover:text-brand-500">Árbol del Problema</a>
             <a href="#objetivos" class="block py-1 hover:text-brand-500">Objetivos (Nivel 5)</a>
@@ -126,19 +134,27 @@
 
         <!-- Hero & Delimitation Announcement Section -->
         <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-10 relative overflow-hidden">
-            <div class="absolute top-0 right-0 bg-brand-700 text-white text-[11px] font-bold px-4 py-1 rounded-bl-xl shadow-sm uppercase tracking-wider">
+            <div
+                class="absolute top-0 right-0 bg-brand-700 text-white text-[11px] font-bold px-4 py-1 rounded-bl-xl shadow-sm uppercase tracking-wider">
                 Propuesta de Investigación Aplicada (Delimitada)
             </div>
-            
+
             <div class="max-w-4xl space-y-4">
                 <div class="flex flex-wrap items-center gap-2">
-                    <span class="bg-slate-100 text-slate-700 text-xs px-3 py-1 rounded-md font-mono border border-slate-200">Formato Institucional: P05-FT</span>
-                    <span class="bg-brand-100 text-brand-900 text-xs px-3 py-1 rounded-md font-bold border border-brand-300">Taxonomía Marzano: Nivel 5 (Síntesis / Desarrollo)</span>
-                    <span class="bg-amber-100 text-amber-900 text-xs px-3 py-1 rounded-md font-semibold border border-amber-300">Alcance Acotado: Prototipo & Validación Tesis</span>
+                    <span
+                        class="bg-slate-100 text-slate-700 text-xs px-3 py-1 rounded-md font-mono border border-slate-200">Formato
+                        Institucional: P05-FT</span>
+                    <span
+                        class="bg-brand-100 text-brand-900 text-xs px-3 py-1 rounded-md font-bold border border-brand-300">Taxonomía
+                        Marzano: Nivel 5 (Síntesis / Desarrollo)</span>
+                    <span
+                        class="bg-amber-100 text-amber-900 text-xs px-3 py-1 rounded-md font-semibold border border-amber-300">Alcance
+                        Acotado: Prototipo & Validación Tesis</span>
                 </div>
 
                 <h1 class="text-2xl md:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
-                    Desarrollo de un Sistema POS con Arquitectura PWA para la Sistematización y Control de Ventas e Inventario en Microempresas Locales
+                    Desarrollo de un Sistema POS con Arquitectura PWA para la Sistematización y Control de Ventas e
+                    Inventario en Microempresas Locales
                 </h1>
 
                 <!-- Explicit Delimitation Banner -->
@@ -147,8 +163,13 @@
                         <span>🎯 DELIMITACIÓN DEL ALCANCE (REQUERIMIENTO INSTITUCIONAL)</span>
                     </div>
                     <p class="text-xs md:text-sm text-amber-950 leading-relaxed">
-                        <strong>¿Hasta dónde llega esta investigación?</strong> El presente trabajo se delimita estrictamente al <strong>Nivel 5 de la Taxonomía de Marzano (Síntesis / Crear)</strong>. Se enfoca en el <i>diseño, desarrollo de software y validación funcional/usabilidad</i> del prototipo de Sistema POS PWA. 
-                        <strong>Exclusión explícita:</strong> No abarca evaluaciones de impacto económico longitudinales en el comercio de Roldanillo ni análisis pre/post de métricas financieras del negocio real, dada la restricción de tiempo y capacidad operativa del proyecto de grado.
+                        <strong>¿Hasta dónde llega esta investigación?</strong> El presente trabajo se delimita
+                        estrictamente al <strong>Nivel 5 de la Taxonomía de Marzano (Síntesis / Crear)</strong>. Se
+                        enfoca en el <i>diseño, desarrollo de software y validación funcional/usabilidad</i> del
+                        prototipo de Sistema POS PWA.
+                        <strong>Exclusión explícita:</strong> No abarca evaluaciones de impacto económico longitudinales
+                        en el comercio de Roldanillo ni análisis pre/post de métricas financieras del negocio real, dada
+                        la restricción de tiempo y capacidad operativa del proyecto de grado.
                     </p>
                 </div>
             </div>
@@ -158,61 +179,76 @@
         <section id="ficha-inicial" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 space-y-6">
             <div class="border-b border-slate-200 pb-4 flex flex-col md:flex-row md:items-center justify-between gap-2">
                 <div>
-                    <span class="text-xs font-bold text-brand-700 tracking-widest uppercase">Resumen Ejecutivo para Entrega</span>
+                    <span class="text-xs font-bold text-brand-700 tracking-widest uppercase">Resumen Ejecutivo para
+                        Entrega</span>
                     <h2 class="text-2xl font-bold text-slate-900 mt-1">Ficha Inicial de la Propuesta (P05-FT)</h2>
                 </div>
-                <button onclick="window.print()" class="self-start md:self-auto px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg border border-slate-300 transition">
+                <button onclick="window.print()"
+                    class="self-start md:self-auto px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg border border-slate-300 transition">
                     🖨️ Imprimir / Guardar PDF
                 </button>
             </div>
 
             <p class="text-xs md:text-sm text-slate-600">
-                Esta ficha sintetiza los elementos normativos requeridos en la fase inicial de revisión docente. Puede ser presentada directamente como documento base de aprobación.
+                Esta ficha sintetiza los elementos normativos requeridos en la fase inicial de revisión docente. Puede
+                ser presentada directamente como documento base de aprobación.
             </p>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
                 <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-                    <span class="text-slate-400 font-bold uppercase block text-[10px]">1. Título Oficial de la Propuesta</span>
+                    <span class="text-slate-400 font-bold uppercase block text-[10px]">1. Título Oficial de la
+                        Propuesta</span>
                     <p class="font-bold text-slate-900 text-sm">
-                        Desarrollo de un Sistema POS con Arquitectura PWA para la Sistematización y Control de Ventas e Inventario en Microempresas Locales.
+                        Desarrollo de un Sistema POS con Arquitectura PWA para la Sistematización y Control de Ventas e
+                        Inventario en Microempresas Locales.
                     </p>
                 </div>
 
                 <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-                    <span class="text-slate-400 font-bold uppercase block text-[10px]">2. Nivel Taxonómico (Marzano / Bloom)</span>
+                    <span class="text-slate-400 font-bold uppercase block text-[10px]">2. Nivel Taxonómico (Marzano /
+                        Bloom)</span>
                     <p class="font-bold text-brand-800 text-sm">
                         Nivel 5: Síntesis / Desarrollo (Creación de Artefacto Tecnológico)
                     </p>
                     <p class="text-[11px] text-slate-600">
-                        Verbo Principal: <strong>Desarrollar</strong>. Enfocado en la concepción y construcción de la solución de software PWA.
+                        Verbo Principal: <strong>Desarrollar</strong>. Enfocado en la concepción y construcción de la
+                        solución de software PWA.
                     </p>
                 </div>
 
                 <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-                    <span class="text-slate-400 font-bold uppercase block text-[10px]">3. Pregunta Problema Redefinida</span>
+                    <span class="text-slate-400 font-bold uppercase block text-[10px]">3. Pregunta Problema
+                        Redefinida</span>
                     <p class="font-semibold text-slate-800 italic">
-                        "¿De qué manera el desarrollo de un Sistema POS con arquitectura PWA y almacenamiento descentralizado (Offline-First) permite sistematizar los procesos de venta e inventario y garantizar la usabilidad en microempresas locales?"
+                        "¿De qué manera el desarrollo de un Sistema POS con arquitectura PWA y almacenamiento
+                        descentralizado (Offline-First) permite sistematizar los procesos de venta e inventario y
+                        garantizar la usabilidad en microempresas locales?"
                     </p>
                 </div>
 
                 <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-                    <span class="text-slate-400 font-bold uppercase block text-[10px]">4. Entregable Técnico Principal</span>
+                    <span class="text-slate-400 font-bold uppercase block text-[10px]">4. Entregable Técnico
+                        Principal</span>
                     <p class="font-semibold text-slate-800">
-                        Prototipo Funcional de Software POS PWA + Informe de Validación de Usabilidad Técnica (Escala SUS) e Inoperabilidad Cero Fuera de Línea.
+                        Prototipo Funcional de Software POS PWA + Informe de Validación de Usabilidad Técnica (Escala
+                        SUS) e Inoperabilidad Cero Fuera de Línea.
                     </p>
                 </div>
             </div>
         </section>
 
         <!-- Section 2: Árbol del Problema Interactivo -->
-        <section id="arbol-problema" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 space-y-8">
+        <section id="arbol-problema"
+            class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 space-y-8">
             <div class="border-b border-slate-200 pb-4">
-                <span class="text-xs font-bold text-brand-700 tracking-widest uppercase">Estructuración Causal de la Investigación</span>
+                <span class="text-xs font-bold text-brand-700 tracking-widest uppercase">Estructuración Causal de la
+                    Investigación</span>
                 <h2 class="text-2xl font-bold text-slate-900 mt-1">Árbol del Problema</h2>
             </div>
 
             <p class="text-xs md:text-sm text-slate-600">
-                El diagrama jerárquico a continuación representa la estructura lógica de la problemática identificada en las microempresas locales. Selecciona cualquier nodo para ver su análisis detallado.
+                El diagrama jerárquico a continuación representa la estructura lógica de la problemática identificada en
+                las microempresas locales. Selecciona cualquier nodo para ver su análisis detallado.
             </p>
 
             <!-- Tree Visualization -->
@@ -223,17 +259,23 @@
                         <span>🍃 EFECTOS Y CONSECUENCIAS (Nivel Superior / Copa del Árbol)</span>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                        <div onclick="inspectTreeNode('efecto1')" id="node-efecto1" class="p-3 bg-red-50 hover:bg-red-100 border border-red-200 rounded-xl cursor-pointer transition text-xs space-y-1">
+                        <div onclick="inspectTreeNode('efecto1')" id="node-efecto1"
+                            class="p-3 bg-red-50 hover:bg-red-100 border border-red-200 rounded-xl cursor-pointer transition text-xs space-y-1">
                             <span class="font-bold text-red-900 block">Efecto 1: Pérdidas Financieras</span>
-                            <p class="text-slate-600 text-[11px]">Fugas de capital por errores aritméticos en cuadres diarios.</p>
+                            <p class="text-slate-600 text-[11px]">Fugas de capital por errores aritméticos en cuadres
+                                diarios.</p>
                         </div>
-                        <div onclick="inspectTreeNode('efecto2')" id="node-efecto2" class="p-3 bg-red-50 hover:bg-red-100 border border-red-200 rounded-xl cursor-pointer transition text-xs space-y-1">
+                        <div onclick="inspectTreeNode('efecto2')" id="node-efecto2"
+                            class="p-3 bg-red-50 hover:bg-red-100 border border-red-200 rounded-xl cursor-pointer transition text-xs space-y-1">
                             <span class="font-bold text-red-900 block">Efecto 2: Ineficiencia Temporal</span>
-                            <p class="text-slate-600 text-[11px]">Consumo de 2 a 3 horas diarias en tareas manuales de conteo.</p>
+                            <p class="text-slate-600 text-[11px]">Consumo de 2 a 3 horas diarias en tareas manuales de
+                                conteo.</p>
                         </div>
-                        <div onclick="inspectTreeNode('efecto3')" id="node-efecto3" class="p-3 bg-red-50 hover:bg-red-100 border border-red-200 rounded-xl cursor-pointer transition text-xs space-y-1">
+                        <div onclick="inspectTreeNode('efecto3')" id="node-efecto3"
+                            class="p-3 bg-red-50 hover:bg-red-100 border border-red-200 rounded-xl cursor-pointer transition text-xs space-y-1">
                             <span class="font-bold text-red-900 block">Efecto 3: Riesgo Normativo DIAN</span>
-                            <p class="text-slate-600 text-[11px]">Vulnerabilidad a sanciones por la Res. 000165/2023.</p>
+                            <p class="text-slate-600 text-[11px]">Vulnerabilidad a sanciones por la Res. 000165/2023.
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -243,10 +285,13 @@
                     <div class="flex items-center space-x-2 text-xs font-bold text-brand-800 uppercase tracking-wider">
                         <span>🪵 PROBLEMA CENTRAL PRIORIZADO (Tronco)</span>
                     </div>
-                    <div onclick="inspectTreeNode('problema')" id="node-problema" class="p-4 bg-brand-700 text-white rounded-xl shadow-md cursor-pointer transition text-xs md:text-sm space-y-1 border-2 border-brand-800">
-                        <span class="font-extrabold text-brand-100 uppercase block tracking-wider text-[11px]">Problema Priorizado:</span>
+                    <div onclick="inspectTreeNode('problema')" id="node-problema"
+                        class="p-4 bg-brand-700 text-white rounded-xl shadow-md cursor-pointer transition text-xs md:text-sm space-y-1 border-2 border-brand-800">
+                        <span class="font-extrabold text-brand-100 uppercase block tracking-wider text-[11px]">Problema
+                            Priorizado:</span>
                         <p class="font-semibold leading-snug">
-                            Carencia de una herramienta tecnológica accesible, liviana y adaptada que permita la sistematización y control automatizado de ventas e inventario en microempresas locales.
+                            Carencia de una herramienta tecnológica accesible, liviana y adaptada que permita la
+                            sistematización y control automatizado de ventas e inventario en microempresas locales.
                         </p>
                     </div>
                 </div>
@@ -257,26 +302,35 @@
                         <span>🌱 CAUSAS DIRECTAS E INDIRECTAS (Nivel Inferior / Raíces)</span>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                        <div onclick="inspectTreeNode('causa1')" id="node-causa1" class="p-3 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-xl cursor-pointer transition text-xs space-y-1">
+                        <div onclick="inspectTreeNode('causa1')" id="node-causa1"
+                            class="p-3 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-xl cursor-pointer transition text-xs space-y-1">
                             <span class="font-bold text-slate-800 block">Causa 1: Gestión Analógica</span>
                             <p class="text-slate-600 text-[11px]">Uso exclusivo de libretas y cuadernos manuscritos.</p>
                         </div>
-                        <div onclick="inspectTreeNode('causa2')" id="node-causa2" class="p-3 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-xl cursor-pointer transition text-xs space-y-1">
+                        <div onclick="inspectTreeNode('causa2')" id="node-causa2"
+                            class="p-3 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-xl cursor-pointer transition text-xs space-y-1">
                             <span class="font-bold text-slate-800 block">Causa 2: Restricción de Costo y Red</span>
-                            <p class="text-slate-600 text-[11px]">Software ERP costoso e inoperante sin internet estable.</p>
+                            <p class="text-slate-600 text-[11px]">Software ERP costoso e inoperante sin internet
+                                estable.</p>
                         </div>
-                        <div onclick="inspectTreeNode('causa3')" id="node-causa3" class="p-3 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-xl cursor-pointer transition text-xs space-y-1">
+                        <div onclick="inspectTreeNode('causa3')" id="node-causa3"
+                            class="p-3 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-xl cursor-pointer transition text-xs space-y-1">
                             <span class="font-bold text-slate-800 block">Causa 3: Brecha de Complejidad UX</span>
-                            <p class="text-slate-600 text-[11px]">Sistemas comerciales complejos para usuarios tradicionales.</p>
+                            <p class="text-slate-600 text-[11px]">Sistemas comerciales complejos para usuarios
+                                tradicionales.</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Tree Inspector Detail Box -->
-                <div id="tree-inspector" class="p-4 bg-slate-900 text-slate-200 rounded-xl text-xs space-y-2 border border-slate-800">
-                    <span id="tree-inspect-title" class="text-brand-400 font-bold uppercase tracking-wider block">Inspección de Nodo del Árbol:</span>
+                <div id="tree-inspector"
+                    class="p-4 bg-slate-900 text-slate-200 rounded-xl text-xs space-y-2 border border-slate-800">
+                    <span id="tree-inspect-title"
+                        class="text-brand-400 font-bold uppercase tracking-wider block">Inspección de Nodo del
+                        Árbol:</span>
                     <p id="tree-inspect-body" class="text-slate-300 leading-relaxed">
-                        Haz clic sobre cualquier elemento del árbol superior (Efectos, Problema Central o Causas) para desplegar su justificación metodológica y la evidencia bibliográfica que lo sustenta.
+                        Haz clic sobre cualquier elemento del árbol superior (Efectos, Problema Central o Causas) para
+                        desplegar su justificación metodológica y la evidencia bibliográfica que lo sustenta.
                     </p>
                 </div>
             </div>
@@ -285,56 +339,70 @@
         <!-- Section 3: Pregunta, Justificación y Objetivos (Nivel 5 Marzano) -->
         <section id="objetivos" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 space-y-8">
             <div class="border-b border-slate-200 pb-4">
-                <span class="text-xs font-bold text-brand-700 tracking-widest uppercase">Estructura de Objetivos del Proyecto</span>
+                <span class="text-xs font-bold text-brand-700 tracking-widest uppercase">Estructura de Objetivos del
+                    Proyecto</span>
                 <h2 class="text-2xl font-bold text-slate-900 mt-1">Objetivos de Investigación (Nivel 5)</h2>
             </div>
 
             <!-- Objective General Banner -->
             <div class="p-5 bg-brand-50 border border-brand-300 rounded-xl space-y-2">
                 <div class="flex items-center justify-between flex-wrap gap-2">
-                    <span class="font-bold text-brand-900 text-xs tracking-wider uppercase">OBJETIVO GENERAL (NIVEL 5 MARZANO)</span>
-                    <span class="bg-brand-700 text-white text-[10px] px-2.5 py-0.5 rounded font-mono font-bold">Síntesis / Desarrollo</span>
+                    <span class="font-bold text-brand-900 text-xs tracking-wider uppercase">OBJETIVO GENERAL (NIVEL 5
+                        MARZANO)</span>
+                    <span class="bg-brand-700 text-white text-[10px] px-2.5 py-0.5 rounded font-mono font-bold">Síntesis
+                        / Desarrollo</span>
                 </div>
                 <p class="text-sm md:text-base text-brand-950 font-bold leading-relaxed">
-                    Desarrollar un sistema POS con arquitectura PWA para la sistematización y control de ventas e inventario en microempresas locales, mediante la implementación de almacenamiento desacoplado (Offline-First) y una interfaz simplificada adaptada a las necesidades del pequeño comerciante.
+                    Desarrollar un sistema POS con arquitectura PWA para la sistematización y control de ventas e
+                    inventario en microempresas locales, mediante la implementación de almacenamiento desacoplado
+                    (Offline-First) y una interfaz simplificada adaptada a las necesidades del pequeño comerciante.
                 </p>
             </div>
 
             <!-- Specific Objectives Grid -->
             <div class="space-y-3">
-                <h3 class="font-bold text-slate-900 text-sm uppercase tracking-wider">Objetivos Específicos (Entregables Metodológicos)</h3>
-                
+                <h3 class="font-bold text-slate-900 text-sm uppercase tracking-wider">Objetivos Específicos (Entregables
+                    Metodológicos)</h3>
+
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
                         <div class="flex items-center justify-between">
                             <span class="text-[10px] font-bold text-slate-500">OBJETIVO ESPECÍFICO 1</span>
-                            <span class="bg-slate-200 text-slate-800 text-[10px] font-bold px-2 py-0.5 rounded">Nivel 3: Análisis</span>
+                            <span class="bg-slate-200 text-slate-800 text-[10px] font-bold px-2 py-0.5 rounded">Nivel 3:
+                                Análisis</span>
                         </div>
                         <span class="font-bold text-slate-900 text-xs block">Diagnosticar Requerimientos</span>
                         <p class="text-xs text-slate-600 leading-relaxed">
-                            Diagnosticar los requerimientos funcionales, técnicos y de usabilidad en los procesos de venta e inventario de las microempresas locales para definir la arquitectura de información del sistema.
+                            Diagnosticar los requerimientos funcionales, técnicos y de usabilidad en los procesos de
+                            venta e inventario de las microempresas locales para definir la arquitectura de información
+                            del sistema.
                         </p>
                     </div>
 
                     <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
                         <div class="flex items-center justify-between">
                             <span class="text-[10px] font-bold text-slate-500">OBJETIVO ESPECÍFICO 2</span>
-                            <span class="bg-brand-600 text-white text-[10px] font-bold px-2 py-0.5 rounded">Nivel 5: Síntesis</span>
+                            <span class="bg-brand-600 text-white text-[10px] font-bold px-2 py-0.5 rounded">Nivel 5:
+                                Síntesis</span>
                         </div>
                         <span class="font-bold text-slate-900 text-xs block">Diseñar y Codificar PWA</span>
                         <p class="text-xs text-slate-600 leading-relaxed">
-                            Diseñar y desarrollar la aplicación web progresiva (PWA) integrando Service Workers e IndexedDB para garantizar la persistencia de datos transaccionales en entornos sin conectividad.
+                            Diseñar y desarrollar la aplicación web progresiva (PWA) integrando Service Workers e
+                            IndexedDB para garantizar la persistencia de datos transaccionales en entornos sin
+                            conectividad.
                         </p>
                     </div>
 
                     <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
                         <div class="flex items-center justify-between">
                             <span class="text-[10px] font-bold text-slate-500">OBJETIVO ESPECÍFICO 3</span>
-                            <span class="bg-slate-200 text-slate-800 text-[10px] font-bold px-2 py-0.5 rounded">Nivel 4: Aplicación</span>
+                            <span class="bg-slate-200 text-slate-800 text-[10px] font-bold px-2 py-0.5 rounded">Nivel 4:
+                                Aplicación</span>
                         </div>
                         <span class="font-bold text-slate-900 text-xs block">Validar usabilidad técnica</span>
                         <p class="text-xs text-slate-600 leading-relaxed">
-                            Validar técnicamente la usabilidad y el desempeño del prototipo PWA mediante pruebas de laboratorio en dispositivos móviles convencionales utilizando la escala psicométrica SUS.
+                            Validar técnicamente la usabilidad y el desempeño del prototipo PWA mediante pruebas de
+                            laboratorio en dispositivos móviles convencionales utilizando la escala psicométrica SUS.
                         </p>
                     </div>
                 </div>
@@ -344,17 +412,21 @@
         <!-- Section 4: Marco Referencial y Estado del Arte -->
         <section id="estado-arte" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 space-y-8">
             <div class="border-b border-slate-200 pb-4">
-                <span class="text-xs font-bold text-brand-700 tracking-widest uppercase">Revisión Sistemática de Literatura</span>
+                <span class="text-xs font-bold text-brand-700 tracking-widest uppercase">Revisión Sistemática de
+                    Literatura</span>
                 <h2 class="text-2xl font-bold text-slate-900 mt-1">Estado del Arte (12 Investigaciones Clave)</h2>
             </div>
 
             <p class="text-xs md:text-sm text-slate-600">
-                Filtra la matriz bibliográfica construida a partir de fuentes indexadas (SciELO, IEEE, Dialnet, ScienceDirect) para fundamentar el desarrollo de aplicaciones web progresivas en microempresas.
+                Filtra la matriz bibliográfica construida a partir de fuentes indexadas (SciELO, IEEE, Dialnet,
+                ScienceDirect) para fundamentar el desarrollo de aplicaciones web progresivas en microempresas.
             </p>
 
             <!-- Search Filter -->
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <input type="text" id="sota-search" onkeyup="filterSota()" placeholder="Buscar por autor, tema, PWA, usabilidad o base de datos..." class="px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none w-full md:w-80">
+                <input type="text" id="sota-search" onkeyup="filterSota()"
+                    placeholder="Buscar por autor, tema, PWA, usabilidad o base de datos..."
+                    class="px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none w-full md:w-80">
                 <span class="text-xs text-slate-500" id="sota-count">Mostrando 12 investigaciones</span>
             </div>
 
@@ -379,48 +451,58 @@
         <!-- Section 5: Arquitectura Técnica PWA y Metodología de Desarrollo -->
         <section id="metodologia" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 space-y-8">
             <div class="border-b border-slate-200 pb-4">
-                <span class="text-xs font-bold text-brand-700 tracking-widest uppercase">Ingeniería de Software & Pruebas</span>
+                <span class="text-xs font-bold text-brand-700 tracking-widest uppercase">Ingeniería de Software &
+                    Pruebas</span>
                 <h2 class="text-2xl font-bold text-slate-900 mt-1">Metodología de Desarrollo PWA y Pruebas</h2>
             </div>
 
             <p class="text-xs md:text-sm text-slate-600">
-                La metodología adopta el paradigma de desarrollo ágil de software enfocado en aplicaciones Offline-First. A continuación se desglosa el pipeline técnico de procesamiento de datos local.
+                La metodología adopta el paradigma de desarrollo ágil de software enfocado en aplicaciones
+                Offline-First. A continuación se desglosa el pipeline técnico de procesamiento de datos local.
             </p>
 
             <!-- Interactive Architecture Pipeline -->
             <div class="space-y-4">
-                <h3 class="font-bold text-slate-900 text-sm uppercase tracking-wider">Flujo de Persistencia de Datos Offline-First</h3>
-                
+                <h3 class="font-bold text-slate-900 text-sm uppercase tracking-wider">Flujo de Persistencia de Datos
+                    Offline-First</h3>
+
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs" id="pipeline-container">
-                    <div onclick="selectPipelineStep(1)" id="pipe-1" class="p-4 rounded-xl border-2 border-brand-500 bg-brand-50 cursor-pointer space-y-2 transition">
+                    <div onclick="selectPipelineStep(1)" id="pipe-1"
+                        class="p-4 rounded-xl border-2 border-brand-500 bg-brand-50 cursor-pointer space-y-2 transition">
                         <span class="bg-brand-700 text-white font-mono px-2 py-0.5 rounded text-[10px]">Paso 1</span>
                         <h4 class="font-bold text-slate-900">Registro Local (UI)</h4>
                         <p class="text-slate-600">Venta ingresada en la pantalla táctil sin consultar la nube.</p>
                     </div>
 
-                    <div onclick="selectPipelineStep(2)" id="pipe-2" class="p-4 rounded-xl border border-slate-200 bg-slate-50 cursor-pointer space-y-2 transition">
+                    <div onclick="selectPipelineStep(2)" id="pipe-2"
+                        class="p-4 rounded-xl border border-slate-200 bg-slate-50 cursor-pointer space-y-2 transition">
                         <span class="bg-slate-700 text-white font-mono px-2 py-0.5 rounded text-[10px]">Paso 2</span>
                         <h4 class="font-bold text-slate-900">Service Worker Proxy</h4>
                         <p class="text-slate-600">Intercepta peticiones de red y detecta estado del modem.</p>
                     </div>
 
-                    <div onclick="selectPipelineStep(3)" id="pipe-3" class="p-4 rounded-xl border border-slate-200 bg-slate-50 cursor-pointer space-y-2 transition">
+                    <div onclick="selectPipelineStep(3)" id="pipe-3"
+                        class="p-4 rounded-xl border border-slate-200 bg-slate-50 cursor-pointer space-y-2 transition">
                         <span class="bg-slate-700 text-white font-mono px-2 py-0.5 rounded text-[10px]">Paso 3</span>
                         <h4 class="font-bold text-slate-900">Base Datos IndexedDB</h4>
                         <p class="text-slate-600">Escribe transacciones e inventario localmente en el dispositivo.</p>
                     </div>
 
-                    <div onclick="selectPipelineStep(4)" id="pipe-4" class="p-4 rounded-xl border border-slate-200 bg-slate-50 cursor-pointer space-y-2 transition">
+                    <div onclick="selectPipelineStep(4)" id="pipe-4"
+                        class="p-4 rounded-xl border border-slate-200 bg-slate-50 cursor-pointer space-y-2 transition">
                         <span class="bg-slate-700 text-white font-mono px-2 py-0.5 rounded text-[10px]">Paso 4</span>
                         <h4 class="font-bold text-slate-900">Background Sync</h4>
                         <p class="text-slate-600">Sincroniza datos con la nube al detectar conexión estable.</p>
                     </div>
                 </div>
 
-                <div id="pipeline-detail" class="p-4 bg-slate-900 text-slate-200 rounded-xl text-xs font-mono space-y-1">
+                <div id="pipeline-detail"
+                    class="p-4 bg-slate-900 text-slate-200 rounded-xl text-xs font-mono space-y-1">
                     <span class="text-brand-400 font-bold block">DETALLE DEL COMPONENTE:</span>
                     <p id="pipe-detail-text">
-                        En el Paso 1, la interfaz táctil responde en menos de 50 milisegundos. El inventario local se actualiza inmediatamente en memoria, eliminando el bloqueo que provocan las conexiones de red lentas.
+                        En el Paso 1, la interfaz táctil responde en menos de 50 milisegundos. El inventario local se
+                        actualiza inmediatamente en memoria, eliminando el bloqueo que provocan las conexiones de red
+                        lentas.
                     </p>
                 </div>
             </div>
@@ -429,24 +511,27 @@
         <!-- Section 6: Simulador Técnico de Latencia y Rendimiento -->
         <section id="simulador" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 space-y-8">
             <div class="border-b border-slate-200 pb-4">
-                <span class="text-xs font-bold text-brand-700 tracking-widest uppercase">Simulación de Desempeño Tecnológico</span>
+                <span class="text-xs font-bold text-brand-700 tracking-widest uppercase">Simulación de Desempeño
+                    Tecnológico</span>
                 <h2 class="text-2xl font-bold text-slate-900 mt-1">Simulador de Latencia Transaccional</h2>
             </div>
 
             <p class="text-xs md:text-sm text-slate-600">
-                Este simulador permite comparar el tiempo de respuesta en milisegundos para registrar una venta en caja según la arquitectura de software utilizada y la calidad de la conexión a internet.
+                Este simulador permite comparar el tiempo de respuesta en milisegundos para registrar una venta en caja
+                según la arquitectura de software utilizada y la calidad de la conexión a internet.
             </p>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
                 <div class="space-y-5 bg-slate-50 p-5 rounded-xl border border-slate-200 text-xs">
                     <h3 class="font-bold text-slate-900">Parámetros de Red y Hardware</h3>
-                    
+
                     <div class="space-y-2">
                         <div class="flex justify-between font-medium">
                             <label for="slider-latency" class="text-slate-700">Calidad Red (Latencia Nube ms):</label>
                             <span id="val-latency" class="text-brand-700 font-bold">450 ms</span>
                         </div>
-                        <input type="range" id="slider-latency" min="50" max="2000" value="450" step="50" oninput="updateSimulator()" class="w-full accent-brand-600">
+                        <input type="range" id="slider-latency" min="50" max="2000" value="450" step="50"
+                            oninput="updateSimulator()" class="w-full accent-brand-600">
                     </div>
 
                     <div class="p-4 bg-white rounded-lg border border-slate-200 space-y-2">
@@ -479,22 +564,33 @@
         <!-- Section 7: Cronograma Gantt & Aspectos Bioéticos -->
         <section id="cronograma" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 space-y-8">
             <div class="border-b border-slate-200 pb-4">
-                <span class="text-xs font-bold text-brand-700 tracking-widest uppercase">Planificación del Proyecto de Grado</span>
+                <span class="text-xs font-bold text-brand-700 tracking-widest uppercase">Planificación del Proyecto de
+                    Grado</span>
                 <h2 class="text-2xl font-bold text-slate-900 mt-1">Cronograma de Desarrollo & Bioética</h2>
             </div>
 
             <!-- Gantt -->
             <div class="space-y-4">
-                <h3 class="font-bold text-slate-900 text-sm">Cronograma de Actividades (12 Meses - Desarrollo de Software)</h3>
-                
+                <h3 class="font-bold text-slate-900 text-sm">Cronograma de Actividades (12 Meses - Desarrollo de
+                    Software)</h3>
+
                 <div class="overflow-x-auto border border-slate-200 rounded-xl">
                     <table class="w-full text-left border-collapse text-[11px]">
                         <thead>
                             <tr class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200 text-center">
                                 <th class="p-2 text-left w-2/5">Fase / Actividad</th>
-                                <th class="p-1">M1</th><th class="p-1">M2</th><th class="p-1">M3</th><th class="p-1">M4</th>
-                                <th class="p-1">M5</th><th class="p-1">M6</th><th class="p-1">M7</th><th class="p-1">M8</th>
-                                <th class="p-1">M9</th><th class="p-1">M10</th><th class="p-1">M11</th><th class="p-1">M12</th>
+                                <th class="p-1">M1</th>
+                                <th class="p-1">M2</th>
+                                <th class="p-1">M3</th>
+                                <th class="p-1">M4</th>
+                                <th class="p-1">M5</th>
+                                <th class="p-1">M6</th>
+                                <th class="p-1">M7</th>
+                                <th class="p-1">M8</th>
+                                <th class="p-1">M9</th>
+                                <th class="p-1">M10</th>
+                                <th class="p-1">M11</th>
+                                <th class="p-1">M12</th>
                             </tr>
                         </thead>
                         <tbody id="gantt-tbody" class="divide-y divide-slate-200 text-slate-600">
@@ -506,9 +602,12 @@
 
             <!-- Bioethics -->
             <div class="p-5 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
-                <h3 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Aspectos Bioéticos y Custodia de Datos (Ley 1581 de 2012)</h3>
+                <h3 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Aspectos Bioéticos y Custodia de
+                    Datos (Ley 1581 de 2012)</h3>
                 <p class="text-xs text-slate-600 leading-relaxed">
-                    Las pruebas de usabilidad técnica se realizarán con datos simulados o catalogaciones autorizadas explícitamente mediante consentimiento informado. El prototipo no comercializará información comercial ni almacenará registros bancarios de terceros.
+                    Las pruebas de usabilidad técnica se realizarán con datos simulados o catalogaciones autorizadas
+                    explícitamente mediante consentimiento informado. El prototipo no comercializará información
+                    comercial ni almacenará registros bancarios de terceros.
                 </p>
             </div>
         </section>
@@ -626,7 +725,7 @@
 
         function filterSota() {
             const query = document.getElementById('sota-search').value.toLowerCase();
-            const filtered = sotaData.filter(item => 
+            const filtered = sotaData.filter(item =>
                 item.author.toLowerCase().includes(query) ||
                 item.title.toLowerCase().includes(query) ||
                 item.contribution.toLowerCase().includes(query) ||
@@ -743,4 +842,5 @@
         }
     </script>
 </body>
+
 </html>

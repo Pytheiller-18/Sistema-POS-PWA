@@ -29,8 +29,7 @@ El proyecto se enfoca en:
 
 ```text
 propuesta-investigacion-pos-pwa/
-├── index.html                             # Presentación interactiva principal (PWA / Dashboard)
-├── propuesta_de_investigaci_n_pos_pwa.html # Documento con respaldo de nombre original
+├── index.html                             # Presentación interactiva completa y aplicación principal
 ├── .gitignore                             # Reglas de exclusión de Git
 └── README.md                              # Documentación del proyecto
 ```
