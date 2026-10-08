@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="posGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4f46e5" />
+      <stop offset="50%" stop-color="#6366f1" />
+      <stop offset="100%" stop-color="#06b6d4" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+  <!-- Background Rounded Rect -->
+  <rect width="512" height="512" rx="110" fill="#0f172a" />
+  <rect x="24" y="24" width="464" height="464" rx="90" fill="url(#posGrad)" opacity="0.12" />
+  
+  <!-- POS Terminal & Register Graphic -->
+  <g filter="url(#shadow)">
+    <!-- Terminal Body -->
+    <rect x="96" y="110" width="320" height="230" rx="28" fill="#1e293b" stroke="#38bdf8" stroke-width="6"/>
+    <!-- Terminal Screen -->
+    <rect x="126" y="138" width="260" height="130" rx="16" fill="#0f172a" stroke="#6366f1" stroke-width="3"/>
+    
+    <!-- Screen Content: Barcode & Total -->
+    <path d="M150 165 h12 v40 h-12 z M170 165 h6 v40 h-6 z M184 165 h16 v40 h-16 z M208 165 h8 v40 h-8 z M224 165 h14 v40 h-14 z" fill="#38bdf8"/>
+    <!-- Currency & Total -->
+    <text x="270" y="195" font-family="system-ui, sans-serif" font-size="28" font-weight="900" fill="#10b981">$95.00</text>
+    <text x="270" y="215" font-family="system-ui, sans-serif" font-size="12" font-weight="600" fill="#94a3b8">OFFLINE-READY</text>
+    
+    <!-- Receipt Paper Slot -->
+    <rect x="196" y="70" width="120" height="44" rx="8" fill="#f8fafc" />
+    <path d="M210 85 h92 M210 95 h60" stroke="#94a3b8" stroke-width="3" stroke-linecap="round"/>
+
+    <!-- Keypad Base -->
+    <path d="M70 350 L442 350 L420 420 L92 420 Z" fill="#1e293b" stroke="#475569" stroke-width="4"/>
+    <!-- Keypad Keys -->
+    <rect x="150" y="365" width="40" height="18" rx="4" fill="#334155"/>
+    <rect x="205" y="365" width="40" height="18" rx="4" fill="#334155"/>
+    <rect x="260" y="365" width="40" height="18" rx="4" fill="#334155"/>
+    <rect x="315" y="365" width="45" height="18" rx="4" fill="#10b981"/>
+    
+    <rect x="150" y="390" width="40" height="18" rx="4" fill="#334155"/>
+    <rect x="205" y="390" width="40" height="18" rx="4" fill="#334155"/>
+    <rect x="260" y="390" width="40" height="18" rx="4" fill="#334155"/>
+    <rect x="315" y="390" width="45" height="18" rx="4" fill="#6366f1"/>
+  </g>
+  
+  <!-- Offline Pulse Indicator Badge -->
+  <circle cx="410" cy="110" r="28" fill="#10b981" stroke="#0f172a" stroke-width="6"/>
+  <path d="M398 110 L406 118 L422 102" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

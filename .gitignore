@@ -1,4 +1,4 @@
-﻿# .gitignore
+# .gitignore
 
 # Archivos de sistema operativo
 Thumbs.db
@@ -23,3 +23,12 @@ build/
 # IDEs
 .vscode/
 .idea/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.db
+*.sqlite3
+instance/
+.pytest_cache/

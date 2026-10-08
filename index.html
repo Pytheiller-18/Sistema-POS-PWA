@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ficha Inicial & Propuesta POS PWA - Alcance Delimitado Nivel 5</title>
+    <title>SISTEMA POS PWA | Punto de Venta Offline-First Multi-Tenant</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js CDN -->
@@ -68,47 +68,27 @@
 
 <body class="bg-slate-50 text-slate-800 font-sans antialiased leading-relaxed">
 
-    <!-- Chosen Palette: Warm Technical Slate & Teal with Coral Warning Accents -->
-    <!-- Application Structure Plan: 
-        1. Sticky Institutional Header & Ficha Inicial Fast Action Bar.
-        2. Hero & Delimitation Banner: Clarifies Level 5 Marzano Scope (Development & Usability Validation, excluding long-term field business evaluation).
-        3. Interactive Problem Tree Section (Árbol del Problema): Causas (Raíces), Problema Central (Tronco), Efectos (Copa).
-        4. Ficha Inicial de Investigación (P05-FT): Official institutional summary fields ready for academic submission.
-        5. Objetivos & Marzano Level 5 Matrix: Adjusted verbs focusing on Design, Development, and Lab Validation.
-        6. Marco Referencial & Estado del Arte (12 Studies): Searchable literature table focusing on PWA architecture, TAM model, and local micro-retail.
-        7. Metodología de Desarrollo de Software (Offline-First): SW, IndexedDB, Sync & Heuristic Usability Testing (SUS).
-        8. Interactive Technical Performance Simulator (Chart.js): Comparing offline local latency vs traditional cloud POS.
-        9. Cronograma Gantt & Aspectos Bioéticos.
-        10. Referencias Bibliográficas APA 7.
-        WHY THIS STRUCTURE: Aligns perfectly with the student's need to present a bounded "Ficha Inicial" focusing on software product development (Level 5 Marzano) without over-promising long-term business impact studies in Roldanillo.
-    -->
-    <!-- Visualization & Content Choices: 
-        - Problem Tree -> Goal: Organize Causas/Problema/Efectos -> Interactive visual hierarchy built with Tailwind Grid & JS inspectors -> Dynamic inspection card on click -> No SVG/Mermaid used.
-        - Delimitation Callout -> Goal: Inform scope boundaries -> High-visibility notice highlighting Level 5 (Síntesis/Desarrollo) vs Level 6 (Evaluación de impacto financiero) -> Tailwind visual badges.
-        - Technical Performance Chart -> Goal: Compare transaction latency -> Chart.js Bar Chart -> Slider controls -> Canvas API.
-        - State of the Art -> Goal: Filter 12 studies -> Dynamic JS Table + Search Filter -> Real-time filter.
-    -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
-
     <!-- Navigation Header -->
     <header class="sticky top-0 z-50 bg-slate-900 text-white shadow-md border-b border-slate-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-between h-16">
             <div class="flex items-center space-x-3">
-                <span class="bg-brand-600 text-xs uppercase px-2.5 py-1 rounded-full font-bold tracking-wider">Formato
-                    P05-FT</span>
-                <span class="text-xs md:text-sm font-semibold text-slate-300">Ficha Inicial | Nivel 5 Marzano</span>
+                <span class="bg-indigo-600 text-xs uppercase px-2.5 py-1 rounded-full font-bold tracking-wider">SISTEMA POS PWA</span>
+                <span class="text-xs md:text-sm font-semibold text-slate-300">Software Operativo & Ficha Inicial</span>
             </div>
-            <nav class="hidden lg:flex space-x-6 text-sm font-medium">
+            <nav class="hidden lg:flex items-center space-x-5 text-sm font-medium">
+                <a href="./frontend/index.html" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow transition-colors flex items-center gap-1">
+                    🛒 Abrir Terminal POS PWA
+                </a>
                 <a href="#ficha-inicial" class="hover:text-brand-500 transition-colors">Ficha Inicial</a>
                 <a href="#arbol-problema" class="hover:text-brand-500 transition-colors">Árbol del Problema</a>
-                <a href="#objetivos" class="hover:text-brand-500 transition-colors">Objetivos (Nivel 5)</a>
-                <a href="#estado-arte" class="hover:text-brand-500 transition-colors">Estado del Arte</a>
-                <a href="#metodologia" class="hover:text-brand-500 transition-colors">Metodología PWA</a>
-                <a href="#simulador" class="hover:text-brand-500 transition-colors">Simulador Técnico</a>
-                <a href="#cronograma" class="hover:text-brand-500 transition-colors">Cronograma & Ética</a>
-                <a href="#referencias" class="hover:text-brand-500 transition-colors">Referencias</a>
+                <a href="#objetivos" class="hover:text-brand-500 transition-colors">Objetivos</a>
+                <a href="#metodologia" class="hover:text-brand-500 transition-colors">Arquitectura PWA</a>
+                <a href="#simulador" class="hover:text-brand-500 transition-colors">Simulador</a>
             </nav>
-            <div class="lg:hidden">
+            <div class="lg:hidden flex items-center gap-2">
+                <a href="./frontend/index.html" class="bg-emerald-600 text-white text-[11px] font-bold px-2 py-1 rounded">
+                    🛒 Abrir POS
+                </a>
                 <button id="mobile-menu-btn"
                     class="p-2 rounded-md bg-slate-800 text-slate-300 hover:text-white text-xs">
                     ☰ Menú

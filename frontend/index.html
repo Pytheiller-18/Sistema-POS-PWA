@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0b0f19">
+  <meta name="description" content="SISTEMA POS PWA - Punto de Venta Ligero, Multi-Tenant y Offline-First con sincronización en la nube">
+  
+  <title>SISTEMA POS PWA | Punto de Venta Offline-First</title>
+
+  <!-- PWA Manifest & Icons -->
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" type="image/svg+xml" href="./assets/icon.svg">
+  <link rel="apple-touch-icon" href="./assets/icon.svg">
+
+  <!-- Estilos CSS Modulares -->
+  <link rel="stylesheet" href="./css/variables.css">
+  <link rel="stylesheet" href="./css/layout.css">
+  <link rel="stylesheet" href="./css/components.css">
+</head>
+<body>
+
+  <!-- ================= HEADER SUPERIOR ================= -->
+  <header class="app-header">
+    <div class="brand-section">
+      <img src="./assets/icon.svg" alt="POS Logo" class="brand-logo">
+      <div class="brand-title-group">
+        <h1>SISTEMA POS PWA</h1>
+        <div class="brand-subtitle">
+          <span id="header-tenant-name">Cargando Tienda...</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-status-group">
+      <!-- Indicador de Red (Online / Offline) -->
+      <span id="network-status-badge" class="status-pill online">
+        <span class="pulse-dot"></span> Online
+      </span>
+
+      <!-- Contador de Sincronización Pendiente -->
+      <span id="pending-sync-count" class="sync-badge" style="display: none;">0 pendientes</span>
+
+      <!-- Usuario y Salida -->
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <span id="header-user-name" style="font-size: 0.825rem; font-weight: 700; color: var(--text-secondary);">Usuario</span>
+        <button id="btn-logout" class="btn btn-secondary btn-sm" title="Cerrar Sesión">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= TABS DE NAVEGACIÓN ================= -->
+  <nav class="app-nav">
+    <button class="nav-tab active" data-view="pos">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+      Caja POS
+    </button>
+    <button class="nav-tab" data-view="products">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+      Inventario
+    </button>
+    <button class="nav-tab" data-view="reports">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+      Reportes & Analíticas
+    </button>
+    <button class="nav-tab" data-view="sync">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+      Sincronización Offline
+    </button>
+  </nav>
+
+  <!-- ================= VISTAS PRINCIPALES ================= -->
+  <main class="app-main">
+
+    <!-- 1. VISTA CAJA / POS (DUAL-PANE) -->
+    <section id="view-pos" class="view-section active">
+      <div class="pos-layout">
+
+        <!-- Panel Izquierdo: Catálogo y Búsqueda -->
+        <div class="catalog-pane">
+          <!-- Búsqueda y Escáner -->
+          <div class="search-bar-container">
+            <div class="search-input-wrapper">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="pos-search-input" placeholder="Buscar por nombre o escanear código de barras...">
+            </div>
+          </div>
+
+          <!-- Filtro de Categorías -->
+          <div id="categories-bar" class="categories-bar"></div>
+
+          <!-- Cuadrícula de Productos -->
+          <div id="products-grid" class="products-grid"></div>
+        </div>
+
+        <!-- Panel Derecho: Carrito de Cobro (Sticky en PC, Modal en Móvil) -->
+        <div id="cart-pane" class="cart-pane">
+          <div class="cart-card">
+            <div class="cart-header">
+              <h2>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                Orden Actual (<span class="cart-count-badge">0</span>)
+              </h2>
+              <button id="btn-clear-cart" class="btn btn-secondary btn-sm">Limpiar</button>
+            </div>
+
+            <!-- Lista de Ítems en Carrito -->
+            <div id="cart-items-list" class="cart-items-list"></div>
+
+            <!-- Denominaciones Rápidas de Efectivo -->
+            <div class="quick-cash-row">
+              <button class="cash-pill-btn" onclick="window.posApp.setQuickCash(10000)">$10.000</button>
+              <button class="cash-pill-btn" onclick="window.posApp.setQuickCash(20000)">$20.000</button>
+              <button class="cash-pill-btn" onclick="window.posApp.setQuickCash(50000)">$50.000</button>
+              <button class="cash-pill-btn" onclick="window.posApp.setQuickCash('EXACT')">Exacto</button>
+            </div>
+
+            <!-- Totales -->
+            <div class="cart-summary">
+              <div class="summary-row">
+                <span>Subtotal:</span>
+                <span id="cart-subtotal">$0</span>
+              </div>
+              <div class="summary-row total-row">
+                <span>TOTAL:</span>
+                <span id="cart-total">$0</span>
+              </div>
+            </div>
+
+            <!-- Botón Cobrar -->
+            <button id="btn-checkout" class="btn btn-success btn-block" style="font-size: 1.1rem; padding: 0.85rem;" disabled>
+              Cobrar Venta
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Barra Flotante de Carrito en Celular -->
+      <div class="mobile-cart-bar">
+        <div>
+          <span style="font-size: 0.8rem; color: var(--text-secondary);">Total a cobrar:</span>
+          <div id="mobile-cart-total-badge" style="font-size: 1.25rem; font-weight: 900; color: var(--success);">$0</div>
+        </div>
+        <button id="mobile-cart-toggle-btn" class="btn btn-primary">
+          Ver Orden (<span class="cart-count-badge">0</span>)
+        </button>
+      </div>
+    </section>
+
+    <!-- 2. VISTA DE INVENTARIO / PRODUCTOS -->
+    <section id="view-products" class="view-section">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <div>
+          <h2 style="font-size: 1.35rem; font-weight: 800;">Catálogo de Inventario</h2>
+          <p style="font-size: 0.85rem; color: var(--text-secondary);">Administración multi-tenant de productos, precios y existencias.</p>
+        </div>
+        <button id="btn-new-product" class="btn btn-primary">+ Nuevo Producto</button>
+      </div>
+
+      <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.875rem;">
+          <thead>
+            <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-secondary); background: rgba(0,0,0,0.2);">
+              <th style="padding: 0.85rem 1rem;">Código/SKU</th>
+              <th style="padding: 0.85rem 1rem;">Producto</th>
+              <th style="padding: 0.85rem 1rem;">Categoría</th>
+              <th style="padding: 0.85rem 1rem;">Costo</th>
+              <th style="padding: 0.85rem 1rem;">Precio Venta</th>
+              <th style="padding: 0.85rem 1rem;">Stock</th>
+              <th style="padding: 0.85rem 1rem;">Acción</th>
+            </tr>
+          </thead>
+          <tbody id="products-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 3. VISTA DE REPORTES & ANALÍTICAS -->
+    <section id="view-reports" class="view-section">
+      <div style="margin-bottom: 1.25rem;">
+        <h2 style="font-size: 1.35rem; font-weight: 800;">Reportes y Analíticas Financieras</h2>
+        <p style="font-size: 0.85rem; color: var(--text-secondary);">Métricas de ventas, utilidades netas y productos de alta rotación.</p>
+      </div>
+
+      <div id="reports-offline-warning" style="display: none; background: var(--warning-light); color: var(--warning); padding: 0.75rem 1rem; border-radius: var(--radius-sm); border: 1px solid rgba(245,158,11,0.3); margin-bottom: 1rem;">
+        ⚠️ Se encuentra en modo Offline o sin conexión con el servidor. Las estadísticas consolidadas requieren conexión a la API.
+      </div>
+
+      <!-- Tarjetas KPI -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-title">Ventas de Hoy</div>
+          <div id="kpi-today-sales" class="kpi-value">$0</div>
+          <div id="kpi-today-tickets" class="kpi-desc">0 tickets registrados</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-title">Ventas del Mes</div>
+          <div id="kpi-month-sales" class="kpi-value">$0</div>
+          <div id="kpi-month-growth" class="kpi-desc">+0% vs mes anterior</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-title">Ganancia Neta (Utilidad)</div>
+          <div id="kpi-total-profit" class="kpi-value" style="color: var(--success);">$0</div>
+          <div id="kpi-profit-margin" class="kpi-desc">Margen: 0%</div>
+        </div>
+      </div>
+
+      <!-- Top Productos -->
+      <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem;">
+        <h3 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 1rem;">Top 5 Productos Más Vendidos</h3>
+        <div id="top-products-container">
+          <p style="color: var(--text-muted);">Sin datos disponibles</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. VISTA DE SINCRONIZACIÓN OFFLINE -->
+    <section id="view-sync" class="view-section">
+      <div style="margin-bottom: 1.25rem;">
+        <h2 style="font-size: 1.35rem; font-weight: 800;">Centro de Sincronización Local-First</h2>
+        <p style="font-size: 0.85rem; color: var(--text-secondary);">Supervisa la cola de persistencia IndexedDB y el enlace con la nube.</p>
+      </div>
+
+      <div class="kpi-grid" style="margin-bottom: 1.25rem;">
+        <div class="kpi-card">
+          <div class="kpi-title">Ventas en Cola Offline</div>
+          <div id="sync-pending-count-large" class="kpi-value" style="color: var(--warning);">0</div>
+          <div class="kpi-desc">Pendientes por enviar a MySQL</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-title">Historial Local (Terminal)</div>
+          <div id="sync-history-count-large" class="kpi-value">0</div>
+          <div class="kpi-desc">Registros almacenados en este dispositivo</div>
+        </div>
+      </div>
+
+      <!-- Panel de Control y Pruebas Offline -->
+      <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 1.25rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem;">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <input type="checkbox" id="simulated-offline-toggle" style="width: 18px; height: 18px; cursor: pointer;">
+          <label for="simulated-offline-toggle" style="font-weight: 700; cursor: pointer;">
+            Simular Pérdida de Conexión (Forzar Offline)
+          </label>
+        </div>
+        <button id="btn-trigger-sync" class="btn btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+          Sincronizar Lote Ahora
+        </button>
+      </div>
+
+      <!-- Lista de Pendientes -->
+      <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem;">
+        <h3 style="font-size: 1.05rem; font-weight: 800; margin-bottom: 1rem;">Transacciones Pendientes de Subida</h3>
+        <div id="sync-pending-list"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= MODALES ================= -->
+
+  <!-- Modal 1: Autenticación / Login -->
+  <div id="auth-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Iniciar Sesión - SISTEMA POS PWA</h3>
+      </div>
+      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+        Selecciona una cuenta de demostración o ingresa tus credenciales multi-tenant:
+      </p>
+
+      <!-- Accesos Rápidos Demo -->
+      <div style="display: flex; gap: 0.5rem; margin-bottom: 1.25rem;">
+        <button class="btn btn-secondary btn-sm" style="flex: 1;" onclick="document.getElementById('login-email').value='admin@pos.com'; document.getElementById('login-password').value='admin123';">
+          👤 Admin Demo
+        </button>
+        <button class="btn btn-secondary btn-sm" style="flex: 1;" onclick="document.getElementById('login-email').value='cajero@pos.com'; document.getElementById('login-password').value='cajero123';">
+          💳 Cajero Demo
+        </button>
+      </div>
+
+      <form id="auth-form">
+        <div class="form-group">
+          <label class="form-label">Correo Electrónico:</label>
+          <input type="email" id="login-email" class="form-control" required placeholder="admin@pos.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contraseña:</label>
+          <input type="password" id="login-password" class="form-control" required placeholder="••••••••">
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" style="padding: 0.75rem; margin-top: 1rem;">
+          Ingresar al Sistema
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 2: Cobro y Cambio -->
+  <div id="checkout-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Finalizar Venta</h3>
+        <button id="checkout-modal-close" class="modal-close-btn">&times;</button>
+      </div>
+
+      <div style="text-align: center; margin-bottom: 1.25rem; padding: 1rem; background: var(--bg-surface); border-radius: var(--radius-md);">
+        <span style="font-size: 0.85rem; color: var(--text-secondary);">Monto Total a Cobrar:</span>
+        <div id="checkout-total-display" style="font-size: 2rem; font-weight: 900; color: var(--success);">$0</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Método de Pago:</label>
+        <select id="checkout-payment-method" class="form-control">
+          <option value="CASH">Efectivo</option>
+          <option value="CARD">Tarjeta Débito / Crédito</option>
+          <option value="TRANSFER">Transferencia / QR</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Paga Con (Efectivo Recibido):</label>
+        <input type="number" id="checkout-paid-amount" class="form-control" style="font-size: 1.2rem; font-weight: 800;">
+      </div>
+
+      <!-- Denominaciones Rápidas -->
+      <div class="quick-cash-row" style="margin-bottom: 1.25rem;">
+        <button class="cash-pill-btn" onclick="window.posApp.setQuickCash(10000)">$10.000</button>
+        <button class="cash-pill-btn" onclick="window.posApp.setQuickCash(20000)">$20.000</button>
+        <button class="cash-pill-btn" onclick="window.posApp.setQuickCash(50000)">$50.000</button>
+        <button class="cash-pill-btn" onclick="window.posApp.setQuickCash('EXACT')">Exacto</button>
+      </div>
+
+      <!-- Cambio / Vueltas -->
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.85rem 1rem; background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); border-radius: var(--radius-md); margin-bottom: 1.25rem;">
+        <span style="font-weight: 700; color: var(--text-main);">Cambio / Devuelta:</span>
+        <span id="checkout-change-display" style="font-size: 1.35rem; font-weight: 900; color: var(--success);">$0</span>
+      </div>
+
+      <button id="btn-confirm-sale" class="btn btn-success btn-block" style="padding: 0.85rem; font-size: 1.1rem;">
+        Confirmar y Registrar Venta
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal 3: Recibo / Ticket Térmico -->
+  <div id="receipt-modal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 380px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Ticket de Venta</h3>
+        <button id="receipt-modal-close" class="modal-close-btn">&times;</button>
+      </div>
+
+      <div id="receipt-ticket-content" class="ticket-wrapper"></div>
+
+      <div style="display: flex; gap: 0.75rem; margin-top: 1.25rem;">
+        <button id="btn-print-receipt" class="btn btn-primary" style="flex: 1;">
+          🖨️ Imprimir Ticket
+        </button>
+        <button onclick="document.getElementById('receipt-modal').classList.remove('active')" class="btn btn-secondary" style="flex: 1;">
+          Continuar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 4: Crear / Editar Producto -->
+  <div id="product-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="product-modal-title" class="modal-title">Nuevo Producto</h3>
+        <button id="product-modal-close" class="modal-close-btn">&times;</button>
+      </div>
+
+      <input type="hidden" id="product-form-id">
+      <div class="form-group">
+        <label class="form-label">Nombre del Producto:</label>
+        <input type="text" id="product-form-name" class="form-control" required placeholder="Ej: Bebida Cola 500ml">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Código de Barras / SKU:</label>
+        <input type="text" id="product-form-barcode" class="form-control" placeholder="Ej: 770123456789">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Categoría:</label>
+        <select id="product-form-category" class="form-control"></select>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+        <div class="form-group">
+          <label class="form-label">Precio Costo:</label>
+          <input type="number" id="product-form-cost" class="form-control" placeholder="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Precio Venta:</label>
+          <input type="number" id="product-form-price" class="form-control" placeholder="0">
+        </div>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+        <div class="form-group">
+          <label class="form-label">Stock Inicial:</label>
+          <input type="number" id="product-form-stock" class="form-control" placeholder="10">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Stock Mínimo Alerta:</label>
+          <input type="number" id="product-form-min-stock" class="form-control" placeholder="5">
+        </div>
+      </div>
+
+      <button id="btn-save-product" class="btn btn-primary btn-block" style="padding: 0.75rem; margin-top: 1rem;">
+        Guardar Producto
+      </button>
+    </div>
+  </div>
+
+  <!-- Scripts en orden de dependencia -->
+  <script src="./js/db.js"></script>
+  <script src="./js/api.js"></script>
+  <script src="./js/sync.js"></script>
+  <script src="./js/app.js"></script>
+
+</body>
+</html>
