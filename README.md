@@ -137,13 +137,6 @@ Para validar la seguridad multi-tenant, la deducción de inventario, la idempote
 python backend/tests/test_backend.py
 ```
 
-### Resultados de la Doble Verificación:
-- ✅ **Aislamiento Multi-Tenant:** Tenant A no tiene acceso a los registros de Tenant B (mitigación IDOR).
-- ✅ **Transaccionalidad ACID y Stock:** Las ventas descuentan exactamente las unidades vendidas en la base de datos.
-- ✅ **Idempotencia Offline:** Reintentos con el mismo `client_sync_id` se reconocen sin duplicar cobros ni existencias.
-- ✅ **Sincronización por Lotes:** Procesamiento masivo de ventas con respuesta clasificada de éxitos y fallas.
-- ✅ **Precisión Contable:** Márgenes y utilidades calculados con el costo histórico inmutable de los productos.
-
 ---
 
 ## 📡 Referencia de la API RESTful
