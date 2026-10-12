@@ -728,6 +728,29 @@ class PosApp {
       window.apiClient.clearSession();
       this.checkSession();
     });
+
+    // Alternar visibilidad de contraseña (ojo abierto / cerrado)
+    const btnTogglePass = document.getElementById('btn-toggle-password');
+    const passInput = document.getElementById('login-password');
+    const iconEyeClosed = document.getElementById('icon-eye-closed');
+    const iconEyeOpen = document.getElementById('icon-eye-open');
+
+    if (btnTogglePass && passInput) {
+      btnTogglePass.addEventListener('click', () => {
+        const isPassword = passInput.type === 'password';
+        passInput.type = isPassword ? 'text' : 'password';
+
+        if (isPassword) {
+          iconEyeClosed.style.display = 'none';
+          iconEyeOpen.style.display = 'block';
+          btnTogglePass.title = 'Ocultar contraseña';
+        } else {
+          iconEyeClosed.style.display = 'block';
+          iconEyeOpen.style.display = 'none';
+          btnTogglePass.title = 'Mostrar contraseña';
+        }
+      });
+    }
   }
 }
 
