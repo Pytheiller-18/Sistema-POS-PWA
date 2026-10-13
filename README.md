@@ -168,6 +168,12 @@ python backend/tests/test_backend.py
 
 ---
 
-## 📄 Licencia y Autores
+## 👤 Autor
+
+- **Heiller Tamayo** - *Desarrollo e Investigación*
+  - GitHub: [@Pytheiller-18](https://github.com/Pytheiller-18)
+  - Correo: [heillertamayo@gmail.com](mailto:heillertamayo@gmail.com)
+
+---
 
 Proyecto desarrollado como parte de la propuesta de investigación aplicada y sistematización de microempresas locales con arquitectura **Progressive Web App (PWA)**.
