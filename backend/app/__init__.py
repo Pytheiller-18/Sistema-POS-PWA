@@ -1,10 +1,15 @@
-from flask import Flask, jsonify
+import os
+from flask import Flask, jsonify, send_from_directory, abort
 from app.config import Config
 from app.extensions import db, cors
+from app.utils.validators import ValidationError
+
+FRONTEND_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'frontend'))
+
 
 def create_app(config_class=Config):
     """Fábrica de aplicaciones Flask para el SISTEMA POS PWA."""
-    app = Flask(__name__)
+    app = Flask(__name__, static_folder=None)
     app.config.from_object(config_class)
 
     # Inicializar extensiones
@@ -30,12 +35,45 @@ def create_app(config_class=Config):
         return jsonify({
             'status': 'healthy',
             'system': 'SISTEMA POS PWA API',
-            'version': '1.0.0',
+            'version': '1.1.0',
             'multi_tenant': True,
             'offline_first_ready': True
         }), 200
 
+    # ------------------------------------------------------------------
+    # (A8) Servir el frontend PWA desde el mismo origen que la API.
+    # Un solo puerto => funciona en celulares por Wi-Fi o túnel sin
+    # depender de "localhost:5000" (que en el teléfono apunta a sí mismo).
+    # ------------------------------------------------------------------
+    @app.route('/', methods=['GET'])
+    def frontend_index():
+        return send_from_directory(FRONTEND_DIR, 'index.html')
+
+    @app.route('/<path:filename>', methods=['GET'])
+    def frontend_assets(filename):
+        if filename.startswith('api/'):
+            abort(404)
+        response = send_from_directory(FRONTEND_DIR, filename)
+        if filename == 'sw.js':
+            # El Service Worker nunca debe quedar cacheado por el navegador
+            response.headers['Cache-Control'] = 'no-cache'
+            response.headers['Service-Worker-Allowed'] = '/'
+        return response
+
+    # Cabeceras de seguridad básicas
+    @app.after_request
+    def security_headers(response):
+        response.headers.setdefault('X-Content-Type-Options', 'nosniff')
+        response.headers.setdefault('Referrer-Policy', 'same-origin')
+        response.headers.setdefault('X-Frame-Options', 'SAMEORIGIN')
+        return response
+
     # Manejadores de errores globales
+    @app.errorhandler(ValidationError)
+    def validation_error(error):
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(error)}), 400
+
     @app.errorhandler(400)
     def bad_request(error):
         return jsonify({
@@ -50,8 +88,13 @@ def create_app(config_class=Config):
             'error': str(error.description) if hasattr(error, 'description') else 'Recurso no encontrado'
         }), 404
 
+    @app.errorhandler(405)
+    def method_not_allowed(error):
+        return jsonify({'success': False, 'error': 'Método HTTP no permitido'}), 405
+
     @app.errorhandler(500)
     def internal_error(error):
+        db.session.rollback()
         return jsonify({
             'success': False,
             'error': 'Error interno del servidor'

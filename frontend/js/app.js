@@ -11,6 +11,7 @@ class PosApp {
     this.searchQuery = '';
     this.activeDiscount = 0;
     this.currentSaleCompleted = null;
+    this.isSubmittingSale = false;
 
     // Escáner de código de barras
     this.html5QrCode = null;
@@ -26,6 +27,21 @@ class PosApp {
     this.audioCtx = null;
 
     this.init();
+  }
+
+  // --- Utilidades de Seguridad y Formato (C4, O6) ---
+  escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  formatMoney(amount) {
+    return '$' + Number(amount || 0).toLocaleString('es-CO', { maximumFractionDigits: 0 });
   }
 
   async init() {
@@ -61,6 +77,8 @@ class PosApp {
       document.getElementById('header-tenant-name').textContent = tenant ? tenant.business_name : 'Mi Tienda POS';
       document.getElementById('auth-modal').classList.remove('active');
     } else {
+      document.getElementById('header-user-name').textContent = 'Sin Sesión';
+      document.getElementById('header-tenant-name').textContent = 'POS Offline';
       document.getElementById('auth-modal').classList.add('active');
     }
   }
@@ -87,7 +105,7 @@ class PosApp {
     let html = `<button class="category-chip ${this.selectedCategory === 'ALL' ? 'active' : ''}" data-cat="ALL">Todos</button>`;
     this.categories.forEach((c) => {
       const isActive = this.selectedCategory === c.id ? 'active' : '';
-      html += `<button class="category-chip ${isActive}" data-cat="${c.id}">${c.name}</button>`;
+      html += `<button class="category-chip ${isActive}" data-cat="${this.escapeHtml(c.id)}">${this.escapeHtml(c.name)}</button>`;
     });
 
     container.innerHTML = html;
@@ -134,16 +152,22 @@ class PosApp {
         stockLabel = `Bajo: ${p.stock}`;
       }
 
+      const escapedId = this.escapeHtml(p.id);
+      const escapedName = this.escapeHtml(p.name);
+      const escapedCategory = this.escapeHtml(p.category_name || 'General');
+      const escapedBarcode = this.escapeHtml(p.barcode || 'SIN-CÓDIGO');
+      const formattedPrice = this.formatMoney(p.sale_price);
+
       return `
-        <div class="product-card" data-id="${p.id}">
+        <div class="product-card" data-id="${escapedId}">
           <div class="product-header">
-            <span class="product-category-tag">${p.category_name || 'General'}</span>
+            <span class="product-category-tag">${escapedCategory}</span>
             <span class="product-stock-tag ${stockClass}">${stockLabel}</span>
           </div>
-          <div class="product-name" title="${p.name}">${p.name}</div>
-          <div class="product-barcode">${p.barcode || 'SIN-CÓDIGO'}</div>
+          <div class="product-name" title="${escapedName}">${escapedName}</div>
+          <div class="product-barcode">${escapedBarcode}</div>
           <div class="product-price-row">
-            <span class="product-price">$${Number(p.sale_price).toLocaleString()}</span>
+            <span class="product-price">${formattedPrice}</span>
             <button class="product-add-btn" title="Agregar a la orden">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
             </button>
@@ -216,9 +240,9 @@ class PosApp {
     const badgeElements = document.querySelectorAll('.cart-count-badge');
     badgeElements.forEach((b) => (b.textContent = totalItems));
 
-    document.getElementById('cart-subtotal').textContent = `$${subtotal.toLocaleString()}`;
-    document.getElementById('cart-total').textContent = `$${total.toLocaleString()}`;
-    document.getElementById('mobile-cart-total-badge').textContent = `$${total.toLocaleString()}`;
+    document.getElementById('cart-subtotal').textContent = this.formatMoney(subtotal);
+    document.getElementById('cart-total').textContent = this.formatMoney(total);
+    document.getElementById('mobile-cart-total-badge').textContent = this.formatMoney(total);
 
     if (this.cart.length === 0) {
       itemsList.innerHTML = `
@@ -240,16 +264,16 @@ class PosApp {
     itemsList.innerHTML = this.cart.map((item) => `
       <div class="cart-item">
         <div class="cart-item-info">
-          <div class="cart-item-title">${item.name}</div>
-          <div class="cart-item-price">$${item.price.toLocaleString()} c/u</div>
+          <div class="cart-item-title">${this.escapeHtml(item.name)}</div>
+          <div class="cart-item-price">${this.formatMoney(item.price)} c/u</div>
         </div>
         <div class="cart-qty-control">
-          <button class="cart-qty-btn" onclick="window.posApp.changeCartItemQty('${item.product_id}', -1)">-</button>
+          <button class="cart-qty-btn" onclick="window.posApp.changeCartItemQty('${this.escapeHtml(item.product_id)}', -1)">-</button>
           <span class="cart-qty-val">${item.quantity}</span>
-          <button class="cart-qty-btn" onclick="window.posApp.changeCartItemQty('${item.product_id}', 1)">+</button>
+          <button class="cart-qty-btn" onclick="window.posApp.changeCartItemQty('${this.escapeHtml(item.product_id)}', 1)">+</button>
         </div>
-        <div class="cart-item-total">$${(item.price * item.quantity).toLocaleString()}</div>
-        <button class="cart-item-remove" onclick="window.posApp.removeFromCart('${item.product_id}')">✕</button>
+        <div class="cart-item-total">${this.formatMoney(item.price * item.quantity)}</div>
+        <button class="cart-item-remove" onclick="window.posApp.removeFromCart('${this.escapeHtml(item.product_id)}')">✕</button>
       </div>
     `).join('');
   }
@@ -295,7 +319,7 @@ class PosApp {
     const toast = document.createElement('div');
     toast.className = `toast-message ${type}`;
     const icon = type === 'success' ? '✓' : (type === 'warning' ? '⚠️' : 'ℹ️');
-    toast.innerHTML = `<span style="font-weight:900;">${icon}</span> <span>${message}</span>`;
+    toast.innerHTML = `<span style="font-weight:900;">${icon}</span> <span>${this.escapeHtml(message)}</span>`;
     container.appendChild(toast);
     setTimeout(() => {
       toast.style.opacity = '0';
@@ -398,7 +422,7 @@ class PosApp {
     } catch (err) {
       console.warn('Error al iniciar cámara para escáner:', err);
       if (lastDetected) {
-        lastDetected.innerHTML = `<span style="color: var(--danger);">⚠️ No se pudo acceder a la cámara: ${err.message || 'Permiso denegado'}</span>`;
+        lastDetected.innerHTML = `<span style="color: var(--danger);">⚠️ No se pudo acceder a la cámara: ${this.escapeHtml(err.message || 'Permiso denegado')}</span>`;
       }
     }
   }
@@ -472,7 +496,7 @@ class PosApp {
         this.showToast(`Agregado: ${product.name}`, 'success');
         const lastDetected = document.getElementById('scanner-last-detected');
         if (lastDetected) {
-          lastDetected.innerHTML = `<strong style="color: var(--success);">✓ ${product.name}</strong> ($${Number(product.sale_price).toLocaleString()})`;
+          lastDetected.innerHTML = `<strong style="color: var(--success);">✓ ${this.escapeHtml(product.name)}</strong> (${this.formatMoney(product.sale_price)})`;
         }
         if (!isContinuous) {
           setTimeout(() => this.stopBarcodeScanner(), 600);
@@ -482,7 +506,7 @@ class PosApp {
         this.showToast(`Código [${cleanCode}] no registrado`, 'warning');
         const lastDetected = document.getElementById('scanner-last-detected');
         if (lastDetected) {
-          lastDetected.innerHTML = `<span style="color: var(--warning);">⚠️ Código [${cleanCode}] no encontrado en catálogo</span>`;
+          lastDetected.innerHTML = `<span style="color: var(--warning);">⚠️ Código [${this.escapeHtml(cleanCode)}] no encontrado en catálogo</span>`;
         }
       }
     } else if (this.scannerContext === 'PRODUCT') {
@@ -501,7 +525,7 @@ class PosApp {
     if (this.cart.length === 0) return;
 
     const { total } = this.calculateCartTotals();
-    document.getElementById('checkout-total-display').textContent = `$${total.toLocaleString()}`;
+    document.getElementById('checkout-total-display').textContent = this.formatMoney(total);
     const paidInput = document.getElementById('checkout-paid-amount');
     paidInput.value = total;
 
@@ -539,10 +563,10 @@ class PosApp {
 
     const sorted = Array.from(suggestions).sort((a, b) => a - b).slice(0, 5);
 
-    let html = `<button type="button" class="cash-pill-btn active" onclick="window.posApp.setQuickCash('EXACT')">Exacto ($${total.toLocaleString()})</button>`;
+    let html = `<button type="button" class="cash-pill-btn active" onclick="window.posApp.setQuickCash('EXACT')">Exacto (${this.formatMoney(total)})</button>`;
     sorted.forEach((val) => {
       if (val !== total) {
-        html += `<button type="button" class="cash-pill-btn" onclick="window.posApp.setQuickCash(${val})">$${val.toLocaleString()}</button>`;
+        html += `<button type="button" class="cash-pill-btn" onclick="window.posApp.setQuickCash(${val})">${this.formatMoney(val)}</button>`;
       }
     });
 
@@ -566,7 +590,7 @@ class PosApp {
         cardEl.className = 'checkout-change-card change-exact';
         if (titleEl) titleEl.textContent = 'Pago Electrónico:';
         if (subtitleEl) subtitleEl.textContent = 'Sin devuelta en efectivo';
-        if (amountEl) amountEl.textContent = `$${total.toLocaleString()}`;
+        if (amountEl) amountEl.textContent = this.formatMoney(total);
       }
       confirmBtn.disabled = false;
       return;
@@ -581,7 +605,7 @@ class PosApp {
     document.querySelectorAll('#checkout-smart-denominations .cash-pill-btn').forEach((btn) => {
       if (paid === total && btn.textContent.includes('Exacto')) {
         btn.classList.add('active');
-      } else if (btn.textContent.includes(paid.toLocaleString()) && !btn.textContent.includes('Exacto')) {
+      } else if (btn.textContent.includes(this.formatMoney(paid)) && !btn.textContent.includes('Exacto')) {
         btn.classList.add('active');
       } else {
         btn.classList.remove('active');
@@ -592,7 +616,7 @@ class PosApp {
       if (cardEl) cardEl.className = 'checkout-change-card change-positive';
       if (titleEl) titleEl.textContent = 'Cambio / Devuelta a Entregar:';
       if (subtitleEl) subtitleEl.textContent = 'Entregar al cliente';
-      if (amountEl) amountEl.textContent = `$${difference.toLocaleString()}`;
+      if (amountEl) amountEl.textContent = this.formatMoney(difference);
       confirmBtn.disabled = false;
     } else if (difference === 0) {
       if (cardEl) cardEl.className = 'checkout-change-card change-exact';
@@ -604,7 +628,7 @@ class PosApp {
       if (cardEl) cardEl.className = 'checkout-change-card change-negative';
       if (titleEl) titleEl.textContent = 'Monto Insuficiente (Faltante):';
       if (subtitleEl) subtitleEl.textContent = 'Falta dinero para cubrir la venta';
-      if (amountEl) amountEl.textContent = `-$${Math.abs(difference).toLocaleString()}`;
+      if (amountEl) amountEl.textContent = `-${this.formatMoney(Math.abs(difference))}`;
       confirmBtn.disabled = true; // Prohibir confirmación hasta cubrir la orden
     }
   }
@@ -625,6 +649,9 @@ class PosApp {
   }
 
   async finalizeSale() {
+    if (this.isSubmittingSale) return;
+    const confirmBtn = document.getElementById('btn-confirm-sale');
+
     const { subtotal, tax, discount, total } = this.calculateCartTotals();
     const paymentMethod = document.getElementById('checkout-payment-method').value;
     let paid = Number(document.getElementById('checkout-paid-amount').value) || total;
@@ -632,16 +659,25 @@ class PosApp {
     if (paymentMethod !== 'CASH') {
       paid = total;
     } else if (paid < total) {
-      alert('El monto pagado en efectivo es insuficiente para completar la venta.');
+      this.showToast('El monto pagado en efectivo es insuficiente para completar la venta.', 'warning');
       return;
     }
 
     const change = Math.max(0, paid - total);
 
+    // (A4) Bloqueo de concurrencia y protección contra doble clic
+    this.isSubmittingSale = true;
+    if (confirmBtn) {
+      confirmBtn.disabled = true;
+      confirmBtn.textContent = 'Procesando venta...';
+    }
+
     const clientSyncId = 'pos-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
     const invoiceNumber = 'POS-' + new Date().getFullYear() + '-' + Math.floor(100000 + Math.random() * 900000);
+    const currentTenant = window.apiClient.tenant;
 
     const salePayload = {
+      tenant_id: currentTenant ? currentTenant.id : null,
       client_sync_id: clientSyncId,
       invoice_number: invoiceNumber,
       subtotal,
@@ -663,47 +699,61 @@ class PosApp {
       }))
     };
 
-    // 1. Descontar stock localmente en IndexedDB de inmediato
-    for (const item of this.cart) {
-      await window.posDB.updateProductStockLocal(item.product_id, item.quantity);
-    }
-
-    // 2. Guardar en cola IndexedDB (Offline-First garantizado)
-    await window.posDB.queuePendingSale(salePayload);
-
-    // 3. Si hay conexión efectiva, sincronizar inmediatamente
-    let isSyncedNow = false;
-    if (window.syncManager.effectiveOnlineStatus() && window.apiClient.isAuthenticated()) {
-      try {
-        const res = await window.apiClient.postSale(salePayload);
-        if (res.success) {
-          await window.posDB.markSaleAsSynced(clientSyncId);
-          isSyncedNow = true;
-        }
-      } catch (err) {
-        console.warn('Venta guardada localmente, sincronización pendiente:', err.message);
+    try {
+      // 1. Descontar stock localmente en IndexedDB de inmediato
+      for (const item of this.cart) {
+        await window.posDB.updateProductStockLocal(item.product_id, item.quantity);
       }
-    }
 
-    // Preparar ticket impreso
-    this.currentSaleCompleted = {
-      ...salePayload,
-      isSynced: isSyncedNow,
-      tenant: window.apiClient.tenant || { business_name: 'Mi Tienda POS', tax_id: 'NIT Demo' },
-      user: window.apiClient.user || { full_name: 'Cajero' }
-    };
+      // 2. Guardar en cola IndexedDB (Offline-First garantizado)
+      await window.posDB.queuePendingSale(salePayload);
 
-    // Cerrar modal de cobro y abrir ticket
-    document.getElementById('checkout-modal').classList.remove('active');
-    this.showReceiptModal();
+      // 3. Si hay conexión efectiva, sincronizar inmediatamente
+      let isSyncedNow = false;
+      if (window.syncManager.effectiveOnlineStatus() && window.apiClient.isAuthenticated()) {
+        try {
+          const res = await window.apiClient.postSale(salePayload);
+          if (res && res.success) {
+            await window.posDB.markSaleAsSynced(clientSyncId);
+            isSyncedNow = true;
+            if (res.sale && res.sale.invoice_number) {
+              salePayload.invoice_number = res.sale.invoice_number;
+            }
+          }
+        } catch (err) {
+          console.warn('Venta guardada localmente, sincronización pendiente:', err.message);
+        }
+      }
 
-    // Limpiar carrito y refrescar UI
-    this.clearCart();
-    await this.loadLocalCatalog();
-    this.refreshPendingSyncCount();
+      // Preparar ticket impreso
+      this.currentSaleCompleted = {
+        ...salePayload,
+        isSynced: isSyncedNow,
+        tenant: currentTenant || { business_name: 'Mi Tienda POS', tax_id: 'NIT Demo' },
+        user: window.apiClient.user || { full_name: 'Cajero' }
+      };
 
-    if (window.innerWidth < 1024) {
-      document.getElementById('cart-pane').classList.remove('mobile-open');
+      // Cerrar modal de cobro y abrir ticket
+      document.getElementById('checkout-modal').classList.remove('active');
+      this.showReceiptModal();
+
+      // Limpiar carrito y refrescar UI
+      this.clearCart();
+      await this.loadLocalCatalog();
+      this.refreshPendingSyncCount();
+
+      if (window.innerWidth < 1024) {
+        document.getElementById('cart-pane').classList.remove('mobile-open');
+      }
+    } catch (e) {
+      console.error('Error al procesar la venta:', e);
+      this.showToast('Error al registrar la venta: ' + e.message, 'warning');
+    } finally {
+      this.isSubmittingSale = false;
+      if (confirmBtn) {
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = 'Confirmar Venta (Enter)';
+      }
     }
   }
 
@@ -714,12 +764,12 @@ class PosApp {
     const receiptContent = document.getElementById('receipt-ticket-content');
     receiptContent.innerHTML = `
       <div class="ticket-header">
-        <div class="ticket-store-name">${sale.tenant.business_name}</div>
-        <div>${sale.tenant.tax_id || ''}</div>
-        <div>Tel: ${sale.tenant.phone || ''}</div>
-        <div style="margin-top: 6px;">Factura: <strong>${sale.invoice_number}</strong></div>
+        <div class="ticket-store-name">${this.escapeHtml(sale.tenant.business_name)}</div>
+        <div>${this.escapeHtml(sale.tenant.tax_id || '')}</div>
+        <div>Tel: ${this.escapeHtml(sale.tenant.phone || '')}</div>
+        <div style="margin-top: 6px;">Factura: <strong>${this.escapeHtml(sale.invoice_number)}</strong></div>
         <div>Fecha: ${new Date(sale.created_at).toLocaleString()}</div>
-        <div>Atendido por: ${sale.user.full_name}</div>
+        <div>Atendido por: ${this.escapeHtml(sale.user.full_name)}</div>
         <div style="margin-top: 4px; font-weight: 700; color: ${sale.isSynced ? '#059669' : '#d97706'};">
           ${sale.isSynced ? '● SINCRONIZADO EN NUBE' : '▲ GUARDADO LOCAL (OFFLINE)'}
         </div>
@@ -730,8 +780,8 @@ class PosApp {
       <div style="margin-bottom: 6px;">
         ${sale.items.map((i) => `
           <div class="ticket-row">
-            <span>${i.quantity}x ${i.product_name}</span>
-            <span>$${i.total.toLocaleString()}</span>
+            <span>${i.quantity}x ${this.escapeHtml(i.product_name)}</span>
+            <span>${this.formatMoney(i.total)}</span>
           </div>
         `).join('')}
       </div>
@@ -740,34 +790,34 @@ class PosApp {
 
       <div class="ticket-row">
         <span>Subtotal:</span>
-        <span>$${sale.subtotal.toLocaleString()}</span>
+        <span>${this.formatMoney(sale.subtotal)}</span>
       </div>
       ${sale.discount > 0 ? `
       <div class="ticket-row">
         <span>Descuento:</span>
-        <span>-$${sale.discount.toLocaleString()}</span>
+        <span>-${this.formatMoney(sale.discount)}</span>
       </div>` : ''}
       <div class="ticket-row ticket-total">
         <span>TOTAL:</span>
-        <span>$${sale.total.toLocaleString()}</span>
+        <span>${this.formatMoney(sale.total)}</span>
       </div>
       <div class="ticket-row">
         <span>Método:</span>
-        <span>${sale.payment_method}</span>
+        <span>${this.escapeHtml(sale.payment_method)}</span>
       </div>
       <div class="ticket-row">
         <span>Pagó con:</span>
-        <span>$${sale.amount_paid.toLocaleString()}</span>
+        <span>${this.formatMoney(sale.amount_paid)}</span>
       </div>
       <div class="ticket-row">
         <span>Cambio / Vueltas:</span>
-        <span>$${sale.change_due.toLocaleString()}</span>
+        <span>${this.formatMoney(sale.change_due)}</span>
       </div>
 
       <div class="ticket-divider"></div>
       <div style="text-align: center; margin-top: 8px;">
         <p>¡Gracias por su compra!</p>
-        <p style="font-size: 10px; color: #888;">ID: ${sale.client_sync_id}</p>
+        <p style="font-size: 10px; color: #888;">ID: ${this.escapeHtml(sale.client_sync_id)}</p>
       </div>
     `;
 
@@ -827,14 +877,14 @@ class PosApp {
 
     tbody.innerHTML = this.products.map((p) => `
       <tr>
-        <td style="font-family: var(--font-mono); font-size: 0.8rem;">${p.barcode || '-'}</td>
-        <td style="font-weight: 700;">${p.name}</td>
-        <td>${p.category_name || 'General'}</td>
-        <td>$${Number(p.cost_price).toLocaleString()}</td>
-        <td style="font-weight: 700; color: var(--success);">$${Number(p.sale_price).toLocaleString()}</td>
+        <td style="font-family: var(--font-mono); font-size: 0.8rem;">${this.escapeHtml(p.barcode || '-')}</td>
+        <td style="font-weight: 700;">${this.escapeHtml(p.name)}</td>
+        <td>${this.escapeHtml(p.category_name || 'General')}</td>
+        <td>${this.formatMoney(p.cost_price)}</td>
+        <td style="font-weight: 700; color: var(--success);">${this.formatMoney(p.sale_price)}</td>
         <td style="font-weight: 800; color: ${p.stock <= p.min_stock ? 'var(--warning)' : 'var(--text-main)'};">${p.stock}</td>
         <td>
-          <button class="btn btn-secondary btn-sm" onclick="window.posApp.openEditProductModal('${p.id}')">Editar</button>
+          <button class="btn btn-secondary btn-sm" onclick="window.posApp.openEditProductModal('${this.escapeHtml(p.id)}')">Editar</button>
         </td>
       </tr>
     `).join('');
@@ -853,7 +903,7 @@ class PosApp {
     // Rellenar categorías
     const catSelect = document.getElementById('product-form-category');
     catSelect.innerHTML = '<option value="">Sin Categoría</option>' + 
-      this.categories.map((c) => `<option value="${c.id}">${c.name}</option>`).join('');
+      this.categories.map((c) => `<option value="${this.escapeHtml(c.id)}">${this.escapeHtml(c.name)}</option>`).join('');
 
     document.getElementById('product-modal').classList.add('active');
   }
@@ -873,7 +923,7 @@ class PosApp {
 
     const catSelect = document.getElementById('product-form-category');
     catSelect.innerHTML = '<option value="">Sin Categoría</option>' + 
-      this.categories.map((c) => `<option value="${c.id}" ${c.id === prod.category_id ? 'selected' : ''}>${c.name}</option>`).join('');
+      this.categories.map((c) => `<option value="${this.escapeHtml(c.id)}" ${c.id === prod.category_id ? 'selected' : ''}>${this.escapeHtml(c.name)}</option>`).join('');
 
     document.getElementById('product-modal').classList.add('active');
   }
@@ -891,7 +941,7 @@ class PosApp {
     };
 
     if (!payload.name) {
-      alert('El nombre del producto es obligatorio');
+      this.showToast('El nombre del producto es obligatorio', 'warning');
       return;
     }
 
@@ -905,72 +955,91 @@ class PosApp {
         const existing = this.products.find((p) => p.id === id);
         if (existing) Object.assign(existing, payload);
         await window.posDB.saveProducts([existing]);
+        this.showToast('Producto actualizado con éxito', 'success');
       } else {
-        // Crear
-        if (window.syncManager.effectiveOnlineStatus()) {
-          const res = await window.apiClient.createProduct(payload);
-          if (res.product) await window.posDB.saveProducts([res.product]);
-        } else {
-          payload.id = 'local-prod-' + Date.now();
-          payload.is_active = true;
-          await window.posDB.saveProducts([payload]);
+        // (A3) Crear nuevo producto: requiere conexión activa para asignar UUID oficial
+        if (!window.syncManager.effectiveOnlineStatus()) {
+          this.showToast('Para evitar inconsistencias en ventas, la creación de nuevos productos requiere conexión activa.', 'warning');
+          return;
         }
+        const res = await window.apiClient.createProduct(payload);
+        if (res.product) {
+          await window.posDB.saveProducts([res.product]);
+        }
+        this.showToast('Producto creado exitosamente', 'success');
       }
 
       document.getElementById('product-modal').classList.remove('active');
       await this.loadLocalCatalog();
     } catch (err) {
-      alert('Error al guardar producto: ' + err.message);
+      this.showToast('Error al guardar producto: ' + err.message, 'warning');
     }
   }
 
-  // --- Vista de Analíticas y Reportes ---
+  // --- Vista de Analíticas y Reportes (A5) ---
   async loadReportsView() {
     if (!window.syncManager.effectiveOnlineStatus() || !window.apiClient.isAuthenticated()) {
       document.getElementById('reports-offline-warning').style.display = 'block';
-    } else {
-      document.getElementById('reports-offline-warning').style.display = 'none';
-      try {
-        const [todayRes, monthRes, profitRes, topRes] = await Promise.all([
-          window.apiClient.getReportsToday(),
-          window.apiClient.getReportsMonthly(),
-          window.apiClient.getReportsProfit(),
-          window.apiClient.getReportsTopProducts(5)
-        ]);
+      return;
+    }
 
-        if (todayRes.success) {
-          document.getElementById('kpi-today-sales').textContent = `$${Number(todayRes.data.total_sales).toLocaleString()}`;
-          document.getElementById('kpi-today-tickets').textContent = `${todayRes.data.transaction_count} tickets`;
-        }
+    document.getElementById('reports-offline-warning').style.display = 'none';
+    const user = window.apiClient.user;
+    const isAdmin = user && user.role === 'ADMIN';
 
-        if (monthRes.success) {
-          document.getElementById('kpi-month-sales').textContent = `$${Number(monthRes.data.total_sales).toLocaleString()}`;
-          document.getElementById('kpi-month-growth').textContent = `${monthRes.data.growth_percentage >= 0 ? '+' : ''}${monthRes.data.growth_percentage}% vs mes anterior`;
-        }
+    try {
+      // Manejo seguro por rol: no rompe la vista si el usuario no es ADMIN
+      const requests = [
+        window.apiClient.getReportsToday().catch((e) => ({ success: false, error: e })),
+        window.apiClient.getReportsMonthly().catch((e) => ({ success: false, error: e })),
+        window.apiClient.getReportsTopProducts(5).catch((e) => ({ success: false, error: e }))
+      ];
 
-        if (profitRes.success) {
-          document.getElementById('kpi-total-profit').textContent = `$${Number(profitRes.data.gross_profit).toLocaleString()}`;
-          document.getElementById('kpi-profit-margin').textContent = `Margen: ${profitRes.data.margin_percentage}%`;
-        }
-
-        if (topRes.success && topRes.data) {
-          const topContainer = document.getElementById('top-products-container');
-          topContainer.innerHTML = topRes.data.map((tp, idx) => `
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.65rem 0; border-bottom: 1px solid var(--border-color);">
-              <div>
-                <span style="font-weight: 800; color: var(--primary); margin-right: 0.5rem;">#${idx + 1}</span>
-                <span style="font-weight: 600;">${tp.product_name}</span>
-              </div>
-              <div style="text-align: right;">
-                <div style="font-weight: 800; color: var(--success);">$${Number(tp.total_revenue).toLocaleString()}</div>
-                <div style="font-size: 0.75rem; color: var(--text-muted);">${tp.total_units} unidades</div>
-              </div>
-            </div>
-          `).join('');
-        }
-      } catch (err) {
-        console.warn('Error al cargar analíticas:', err);
+      if (isAdmin) {
+        requests.push(window.apiClient.getReportsProfit().catch((e) => ({ success: false, error: e })));
       }
+
+      const results = await Promise.all(requests);
+      const todayRes = results[0];
+      const monthRes = results[1];
+      const topRes = results[2];
+      const profitRes = isAdmin ? results[3] : null;
+
+      if (todayRes && todayRes.success && todayRes.data) {
+        document.getElementById('kpi-today-sales').textContent = this.formatMoney(todayRes.data.total_sales);
+        document.getElementById('kpi-today-tickets').textContent = `${todayRes.data.transaction_count} tickets`;
+      }
+
+      if (monthRes && monthRes.success && monthRes.data) {
+        document.getElementById('kpi-month-sales').textContent = this.formatMoney(monthRes.data.total_sales);
+        document.getElementById('kpi-month-growth').textContent = `${monthRes.data.growth_percentage >= 0 ? '+' : ''}${monthRes.data.growth_percentage}% vs mes anterior`;
+      }
+
+      if (profitRes && profitRes.success && profitRes.data) {
+        document.getElementById('kpi-total-profit').textContent = this.formatMoney(profitRes.data.gross_profit);
+        document.getElementById('kpi-profit-margin').textContent = `Margen: ${profitRes.data.margin_percentage}%`;
+      } else if (!isAdmin) {
+        document.getElementById('kpi-total-profit').textContent = 'Solo Admin';
+        document.getElementById('kpi-profit-margin').textContent = 'Acceso restringido';
+      }
+
+      if (topRes && topRes.success && Array.isArray(topRes.data)) {
+        const topContainer = document.getElementById('top-products-container');
+        topContainer.innerHTML = topRes.data.map((tp, idx) => `
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.65rem 0; border-bottom: 1px solid var(--border-color);">
+            <div>
+              <span style="font-weight: 800; color: var(--primary); margin-right: 0.5rem;">#${idx + 1}</span>
+              <span style="font-weight: 600;">${this.escapeHtml(tp.product_name)}</span>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-weight: 800; color: var(--success);">${this.formatMoney(tp.total_revenue)}</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">${tp.total_units} unidades</div>
+            </div>
+          </div>
+        `).join('');
+      }
+    } catch (err) {
+      console.warn('Error al cargar analíticas:', err);
     }
   }
 
@@ -989,11 +1058,11 @@ class PosApp {
       listEl.innerHTML = pending.map((s) => `
         <div style="background: var(--bg-surface); padding: 0.75rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
           <div>
-            <strong>${s.invoice_number}</strong>
+            <strong>${this.escapeHtml(s.invoice_number)}</strong>
             <div style="font-size: 0.75rem; color: var(--text-muted);">${new Date(s.created_at).toLocaleString()} | ${s.items.length} ítems</div>
           </div>
           <div style="text-align: right;">
-            <div style="font-weight: 800; color: var(--warning);">$${s.total.toLocaleString()}</div>
+            <div style="font-weight: 800; color: var(--warning);">${this.formatMoney(s.total)}</div>
             <span style="font-size: 0.7rem; background: var(--warning-light); color: var(--warning); padding: 2px 6px; border-radius: 4px;">Pendiente</span>
           </div>
         </div>
@@ -1118,6 +1187,13 @@ class PosApp {
       if (this.activeView === 'sync') this.loadSyncView();
     });
 
+    // (A6) Interceptación de sesión expirada
+    window.addEventListener('auth-expired', () => {
+      this.clearCart();
+      this.checkSession();
+      this.showToast('Tu sesión ha expirado. Por favor inicia sesión nuevamente.', 'warning');
+    });
+
     // Modal Producto
     document.getElementById('btn-new-product').addEventListener('click', () => this.openNewProductModal());
     document.getElementById('product-modal-close').addEventListener('click', () => {
@@ -1125,7 +1201,7 @@ class PosApp {
     });
     document.getElementById('btn-save-product').addEventListener('click', () => this.saveProductFromModal());
 
-    // Login y Logout
+    // Login y Logout (C3)
     document.getElementById('auth-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('login-email').value;
@@ -1133,18 +1209,29 @@ class PosApp {
       try {
         const res = await window.apiClient.login(email, pass);
         if (res.success) {
+          // (C3) Si se cambió de tienda en el mismo dispositivo, limpiar catálogo anterior
+          const prevTenantId = await window.posDB.getConfig('current_tenant_id');
+          if (prevTenantId && res.tenant && prevTenantId !== res.tenant.id) {
+            await window.posDB.clearCatalogData();
+          }
+          if (res.tenant) {
+            await window.posDB.setConfig('current_tenant_id', res.tenant.id);
+          }
           this.checkSession();
-          await window.syncManager.syncCatalogToLocal();
+          await window.syncManager.syncCatalogToLocal(true);
           await this.loadLocalCatalog();
+          this.showToast('Bienvenido, ' + (res.user ? res.user.full_name : ''), 'success');
         }
       } catch (err) {
-        alert('Error de inicio de sesión: ' + err.message);
+        this.showToast('Error de inicio de sesión: ' + err.message, 'warning');
       }
     });
 
     document.getElementById('btn-logout').addEventListener('click', () => {
+      this.clearCart();
       window.apiClient.clearSession();
       this.checkSession();
+      this.showToast('Sesión cerrada correctamente', 'info');
     });
 
     // Alternar visibilidad de contraseña (ojo abierto / cerrado)

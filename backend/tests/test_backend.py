@@ -221,5 +221,48 @@ class POSBackendTestCase(unittest.TestCase):
         self.assertEqual(profit_data['gross_profit'], 32.0)
         self.assertEqual(profit_data['margin_percentage'], 44.4)
 
+    def test_failed_sale_atomic_rollback_stock_preserved(self):
+        """C2: Si una venta falla a mitad de validación, el stock del producto previo NO se descuenta."""
+        headers_a = {'Authorization': f'Bearer {self.token_a}'}
+        initial_stock = self.product_a.stock
+
+        sale_payload = {
+            'client_sync_id': str(uuid.uuid4()),
+            'items': [
+                {'product_id': self.product_a.id, 'quantity': 5},
+                {'product_id': 'invalid-product-uuid', 'quantity': 1}
+            ]
+        }
+        res = self.client.post('/api/v1/sales', json=sale_payload, headers=headers_a)
+        self.assertEqual(res.status_code, 404)
+
+        # Verificar que el stock de product_a se mantuvo intacto (Rollback atómico)
+        db.session.expire_all()
+        prod = db.session.get(Product, self.product_a.id)
+        self.assertEqual(prod.stock, initial_stock, "El stock no debe modificarse si la venta falló")
+
+    def test_global_email_uniqueness_across_tenants(self):
+        """C5: Un email no puede ser reutilizado en otro tenant para evitar colisiones de login."""
+        headers_b = {'Authorization': f'Bearer {self.token_b}'}
+        new_user_payload = {
+            'email': self.user_a_admin.email, # Ya registrado en Tenant A
+            'full_name': 'Infiltrado',
+            'password': 'password123',
+            'role': 'CASHIER'
+        }
+        res = self.client.post('/api/v1/auth/users', json=new_user_payload, headers=headers_b)
+        self.assertEqual(res.status_code, 409, "Debe rechazar email duplicado globalmente")
+
+    def test_inactive_user_token_rejection(self):
+        """A10: Si un usuario es desactivado en BD, su token deja de ser válido de inmediato."""
+        headers_a = {'Authorization': f'Bearer {self.token_a}'}
+        
+        # Desactivar usuario en base de datos
+        self.user_a_admin.is_active = False
+        db.session.commit()
+
+        res = self.client.get('/api/v1/products', headers=headers_a)
+        self.assertEqual(res.status_code, 401, "Token de usuario inactivo debe ser rechazado inmediatamente")
+
 if __name__ == '__main__':
     unittest.main()

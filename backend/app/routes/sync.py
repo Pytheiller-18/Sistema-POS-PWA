@@ -1,9 +1,10 @@
 from datetime import datetime, timezone
-from flask import Blueprint, request, jsonify, g
+from flask import Blueprint, request, jsonify, g, current_app
 from app.models.sale import Sale
 from app.models.sync_log import SyncAuditLog
 from app.services.sale_service import process_sale
 from app.middlewares.auth import tenant_required
+from app.utils.validators import clean_str
 
 sync_bp = Blueprint('sync', __name__, url_prefix='/api/v1/sync')
 
@@ -13,6 +14,7 @@ sync_bp = Blueprint('sync', __name__, url_prefix='/api/v1/sync')
 # 2. Si un registro ya existía (mismo client_sync_id y tenant_id), se marca
 #    como 'already_synced' sin duplicar deducciones de inventario ni contabilidad.
 # 3. Todo fallo individual se aísla sin cancelar las ventas válidas del lote.
+# 4. Tamaño máximo de lote controlado por MAX_SYNC_BATCH_SIZE para evitar DoS.
 # ============================================================================
 
 @sync_bp.route('/sales-batch', methods=['POST'])
@@ -22,14 +24,21 @@ def sync_sales_batch():
     Recibe un lote de ventas registradas offline en IndexedDB y las sincroniza en la nube.
     Garantiza idempotencia absoluta por `client_sync_id`.
     """
-    data = request.get_json() or {}
+    data = request.get_json(silent=True) or {}
     sales_batch = data.get('sales', [])
-    device_id = data.get('device_id', 'PWA-CLIENT')
+    device_id = clean_str(data.get('device_id'), 'device_id', 100) or 'PWA-CLIENT'
 
     if not sales_batch or not isinstance(sales_batch, list):
         return jsonify({
             'success': False,
             'error': 'El lote debe contener un arreglo de ventas no vacío'
+        }), 400
+
+    max_batch = current_app.config.get('MAX_SYNC_BATCH_SIZE', 200)
+    if len(sales_batch) > max_batch:
+        return jsonify({
+            'success': False,
+            'error': f'El lote excede el tamaño máximo permitido ({max_batch} ventas)'
         }), 400
 
     results = {

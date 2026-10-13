@@ -104,9 +104,9 @@ SISTEMA-POS-PWA/
 
 ## 🚀 Puesta en Marcha Rápida (Local)
 
-### 1. Iniciar el Backend (Python / Flask)
+### 1. Iniciar el Servidor Unificado (Backend API + Frontend PWA)
 
-El backend cuenta con detección automática: si no hay un servidor MySQL configurado localmente, utiliza SQLite como motor de desarrollo sin necesidad de configuración adicional.
+El backend cuenta con detección automática: si no hay un servidor MySQL configurado localmente, utiliza SQLite como motor de desarrollo sin necesidad de configuración adicional. Además, sirve la aplicación PWA en el mismo puerto (`5000`), permitiendo el acceso directo desde computadores y teléfonos móviles en la misma red Wi-Fi o mediante túneles sin conflictos de CORS.
 
 1. Abre una terminal e ingresa a la carpeta `backend`:
    ```powershell
@@ -116,12 +116,12 @@ El backend cuenta con detección automática: si no hay un servidor MySQL config
    ```powershell
    python -m pip install -r requirements.txt
    ```
-3. Inicia el servidor API:
+3. Inicia el servidor del sistema:
    ```powershell
    python run.py
    ```
    *El servidor inicializará las tablas y cargará datos de demostración si es la primera ejecución.*
-   *La API estará escuchando en `http://localhost:5000`.*
+   *El punto de venta estará listo en:* **`http://localhost:5000/`**
 
 #### 🔑 Credenciales Demo Iniciales:
 - **Administrador:** `admin@pos.com` | Contraseña: `admin123`
@@ -129,14 +129,13 @@ El backend cuenta con detección automática: si no hay un servidor MySQL config
 
 ---
 
-### 2. Iniciar el Frontend (PWA)
+### 2. Acceso desde Dispositivos Móviles (Wi-Fi o Celulares)
 
-1. Abre el archivo `frontend/index.html` en tu navegador preferido (Chrome, Edge, Firefox, Safari) o utiliza un servidor estático local:
-   ```powershell
-   # Opción directa en Windows:
-   Start-Process frontend/index.html
+1. Al estar unificado en el puerto `5000`, solo necesitas ingresar desde el navegador de tu celular a la dirección IP local de tu computador:
    ```
-2. Puedes instalar la aplicación como una PWA nativa haciendo clic en el icono de instalación de la barra de direcciones del navegador.
+   http://<IP-DE-TU-PC>:5000/
+   ```
+2. Puedes instalar la aplicación como una PWA nativa tocando el botón «Instalar aplicación» o «Agregar a la pantalla de inicio».
 
 ---
 

@@ -98,6 +98,7 @@ CREATE TABLE IF NOT EXISTS `sales` (
     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_tenant_client_sync` (`tenant_id`, `client_sync_id`),
+    UNIQUE KEY `uk_tenant_invoice_number` (`tenant_id`, `invoice_number`),
     INDEX `idx_sales_tenant_created` (`tenant_id`, `created_at`),
     INDEX `idx_sales_user` (`tenant_id`, `user_id`),
     CONSTRAINT `fk_sales_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE,

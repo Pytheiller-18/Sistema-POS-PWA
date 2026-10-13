@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify, g
 from app.middlewares.auth import tenant_required
+from app.utils.validators import to_int
 from app.services.report_service import (
     get_today_summary,
     get_monthly_summary,
@@ -28,8 +29,10 @@ def report_today():
 @tenant_required(allowed_roles=['ADMIN', 'MANAGER'])
 def report_monthly():
     """Resumen del mes actual y comparativa con el mes previo."""
-    year = request.args.get('year', type=int)
-    month = request.args.get('month', type=int)
+    year_param = request.args.get('year')
+    month_param = request.args.get('month')
+    year = to_int(year_param, 'year', min_value=2000, max_value=2100) if year_param else None
+    month = to_int(month_param, 'month', min_value=1, max_value=12) if month_param else None
     data = get_monthly_summary(g.tenant_id, year=year, month=month)
     return jsonify({'success': True, 'data': data}), 200
 
@@ -37,7 +40,8 @@ def report_monthly():
 @tenant_required(allowed_roles=['ADMIN', 'MANAGER'])
 def report_annual():
     """Resumen acumulado del año desglosado mes a mes."""
-    year = request.args.get('year', type=int)
+    year_param = request.args.get('year')
+    year = to_int(year_param, 'year', min_value=2000, max_value=2100) if year_param else None
     data = get_annual_summary(g.tenant_id, year=year)
     return jsonify({'success': True, 'data': data}), 200
 
@@ -45,7 +49,8 @@ def report_annual():
 @tenant_required(allowed_roles=['ADMIN', 'MANAGER'])
 def report_top_products():
     """Top productos con mayor volumen de ventas e ingresos."""
-    limit = request.args.get('limit', default=5, type=int)
+    limit_param = request.args.get('limit')
+    limit = to_int(limit_param, 'limit', default=5, min_value=1, max_value=50) if limit_param else 5
     data = get_top_products(g.tenant_id, limit=limit)
     return jsonify({'success': True, 'data': data}), 200
 

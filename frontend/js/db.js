@@ -71,7 +71,14 @@ class PosDatabase {
     return new Promise((resolve, reject) => {
       const tx = this.db.transaction('products', 'readwrite');
       const store = tx.objectStore('products');
-      products.forEach((p) => store.put(p));
+      products.forEach((p) => {
+        if (p.is_active === false) {
+          // (A11) Producto desactivado en servidor: eliminar de base local
+          store.delete(p.id);
+        } else {
+          store.put(p);
+        }
+      });
       tx.oncomplete = () => resolve(true);
       tx.onerror = () => reject(tx.error);
     });
@@ -213,6 +220,33 @@ class PosDatabase {
       const req = tx.objectStore('config').get(key);
       req.onsuccess = () => resolve(req.result ? req.result.value : null);
       req.onerror = () => reject(req.error);
+    });
+  }
+
+  // --- Limpieza y Aislamiento Multi-Tenant (C3) ---
+  async clearCatalogData() {
+    await this.init();
+    return new Promise((resolve, reject) => {
+      const tx = this.db.transaction(['products', 'categories', 'config'], 'readwrite');
+      tx.objectStore('products').clear();
+      tx.objectStore('categories').clear();
+      tx.objectStore('config').clear();
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = () => reject(tx.error);
+    });
+  }
+
+  async clearAllData() {
+    await this.init();
+    return new Promise((resolve, reject) => {
+      const tx = this.db.transaction(['products', 'categories', 'pending_sales', 'sales_history', 'config'], 'readwrite');
+      tx.objectStore('products').clear();
+      tx.objectStore('categories').clear();
+      tx.objectStore('pending_sales').clear();
+      tx.objectStore('sales_history').clear();
+      tx.objectStore('config').clear();
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = () => reject(tx.error);
     });
   }
 }

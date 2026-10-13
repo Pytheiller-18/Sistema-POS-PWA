@@ -1,9 +1,28 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from flask import Blueprint, request, jsonify, g
 from app.extensions import db
 from app.models.product import Product, Category
 from app.middlewares.auth import tenant_required
+from app.utils.validators import to_decimal, to_int, clean_str
+
+MAX_PRICE = 999_999_999
+MAX_STOCK = 10_000_000
+
+
+def _utc_naive_now() -> datetime:
+    return datetime.now(timezone.utc).replace(tzinfo=None)
+
+
+def _parse_since(raw: str):
+    """Convierte el parámetro ?since= a datetime UTC naive (formato almacenado en BD)."""
+    try:
+        dt = datetime.fromisoformat(raw.replace('Z', '+00:00'))
+    except (ValueError, AttributeError):
+        return None
+    if dt.tzinfo is not None:
+        dt = dt.astimezone(timezone.utc).replace(tzinfo=None)
+    return dt
 
 products_bp = Blueprint('products', __name__, url_prefix='/api/v1/products')
 
@@ -24,17 +43,18 @@ def list_products():
     category_id = request.args.get('category_id')
     since = request.args.get('since') # Para delta sync offline
 
+    # Hora del servidor ANTES de consultar: el cliente la usará como próximo ?since=
+    # (evita depender del reloj del dispositivo y no pierde cambios concurrentes).
+    server_time = _utc_naive_now()
+
     query = Product.query.filter_by(tenant_id=g.tenant_id)
 
-    # Si no es sincronización delta completa, sólo productos activos
-    if not since:
-        query = query.filter_by(is_active=True)
+    # Delta sync: incluye desactivados para que el cliente los elimine localmente
+    since_dt = _parse_since(since) if since else None
+    if since_dt:
+        query = query.filter(Product.updated_at >= since_dt)
     else:
-        try:
-            since_dt = datetime.fromisoformat(since)
-            query = query.filter(Product.updated_at >= since_dt)
-        except Exception:
-            pass # Si el formato es inválido, continúa con consulta estándar
+        query = query.filter_by(is_active=True)
 
     if category_id:
         query = query.filter_by(category_id=category_id)
@@ -51,6 +71,8 @@ def list_products():
     return jsonify({
         'success': True,
         'count': len(products),
+        'is_delta': bool(since_dt),
+        'server_time': server_time.isoformat(),
         'products': [p.to_dict() for p in products]
     }), 200
 
@@ -70,12 +92,12 @@ def get_product(product_id):
 @tenant_required(allowed_roles=['ADMIN', 'MANAGER'])
 def create_product():
     """Crea un nuevo producto en el catálogo del tenant."""
-    data = request.get_json() or {}
-    name = data.get('name', '').strip()
+    data = request.get_json(silent=True) or {}
+    name = clean_str(data.get('name'), 'name', 150)
     if not name:
         return jsonify({'success': False, 'error': 'El nombre del producto es obligatorio'}), 400
 
-    barcode = data.get('barcode', '').strip() or None
+    barcode = clean_str(data.get('barcode'), 'barcode', 64)
     if barcode:
         # Verificar que el código de barras no esté duplicado en el mismo tenant
         existing = Product.query.filter_by(tenant_id=g.tenant_id, barcode=barcode, is_active=True).first()
@@ -94,10 +116,10 @@ def create_product():
         category_id=category_id,
         barcode=barcode,
         name=name,
-        cost_price=float(data.get('cost_price', 0.0)),
-        sale_price=float(data.get('sale_price', 0.0)),
-        stock=int(data.get('stock', 0)),
-        min_stock=int(data.get('min_stock', 5)),
+        cost_price=to_decimal(data.get('cost_price'), 'cost_price', default=0, min_value=0, max_value=MAX_PRICE),
+        sale_price=to_decimal(data.get('sale_price'), 'sale_price', default=0, min_value=0, max_value=MAX_PRICE),
+        stock=to_int(data.get('stock'), 'stock', default=0, min_value=-MAX_STOCK, max_value=MAX_STOCK),
+        min_stock=to_int(data.get('min_stock'), 'min_stock', default=5, min_value=0, max_value=MAX_STOCK),
         is_active=True
     )
     db.session.add(product)
@@ -114,16 +136,16 @@ def create_product():
 def update_product(product_id):
     """Actualiza datos de un producto dentro del tenant."""
     product = Product.query.filter_by(id=product_id, tenant_id=g.tenant_id).first_or_404()
-    data = request.get_json() or {}
+    data = request.get_json(silent=True) or {}
 
     if 'name' in data:
-        name = data['name'].strip()
+        name = clean_str(data['name'], 'name', 150)
         if not name:
             return jsonify({'success': False, 'error': 'El nombre no puede ser vacío'}), 400
         product.name = name
 
     if 'barcode' in data:
-        barcode = data['barcode'].strip() or None
+        barcode = clean_str(data['barcode'], 'barcode', 64)
         if barcode and barcode != product.barcode:
             existing = Product.query.filter_by(tenant_id=g.tenant_id, barcode=barcode, is_active=True).first()
             if existing and existing.id != product.id:
@@ -139,13 +161,13 @@ def update_product(product_id):
         product.category_id = cat_id
 
     if 'cost_price' in data:
-        product.cost_price = float(data['cost_price'])
+        product.cost_price = to_decimal(data['cost_price'], 'cost_price', min_value=0, max_value=MAX_PRICE)
     if 'sale_price' in data:
-        product.sale_price = float(data['sale_price'])
+        product.sale_price = to_decimal(data['sale_price'], 'sale_price', min_value=0, max_value=MAX_PRICE)
     if 'stock' in data:
-        product.stock = int(data['stock'])
+        product.stock = to_int(data['stock'], 'stock', min_value=-MAX_STOCK, max_value=MAX_STOCK)
     if 'min_stock' in data:
-        product.min_stock = int(data['min_stock'])
+        product.min_stock = to_int(data['min_stock'], 'min_stock', min_value=0, max_value=MAX_STOCK)
     if 'is_active' in data:
         product.is_active = bool(data['is_active'])
 
@@ -184,8 +206,8 @@ def list_categories():
 @tenant_required(allowed_roles=['ADMIN', 'MANAGER'])
 def create_category():
     """Crea una nueva categoría para la tienda."""
-    data = request.get_json() or {}
-    name = data.get('name', '').strip()
+    data = request.get_json(silent=True) or {}
+    name = clean_str(data.get('name'), 'name', 100)
     if not name:
         return jsonify({'success': False, 'error': 'El nombre de categoría es obligatorio'}), 400
 
@@ -193,7 +215,7 @@ def create_category():
         id=str(uuid.uuid4()),
         tenant_id=g.tenant_id,
         name=name,
-        description=data.get('description'),
+        description=clean_str(data.get('description'), 'description', 255),
         is_active=True
     )
     db.session.add(category)

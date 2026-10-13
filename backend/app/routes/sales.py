@@ -3,6 +3,7 @@ from flask import Blueprint, request, jsonify, g
 from app.models.sale import Sale
 from app.services.sale_service import process_sale
 from app.middlewares.auth import tenant_required
+from app.utils.validators import to_int
 
 sales_bp = Blueprint('sales', __name__, url_prefix='/api/v1/sales')
 
@@ -17,7 +18,7 @@ sales_bp = Blueprint('sales', __name__, url_prefix='/api/v1/sales')
 @tenant_required()
 def create_sale():
     """Registra una venta en el punto de venta de forma directa/online."""
-    data = request.get_json() or {}
+    data = request.get_json(silent=True) or {}
     result, status_code = process_sale(
         tenant_id=g.tenant_id,
         user_id=g.user_id,
@@ -30,8 +31,8 @@ def create_sale():
 @tenant_required()
 def list_sales():
     """Lista las ventas del tenant con soporte de paginación y filtros de fecha."""
-    page = int(request.args.get('page', 1))
-    per_page = int(request.args.get('per_page', 20))
+    page = to_int(request.args.get('page'), 'page', default=1, min_value=1, max_value=100000)
+    per_page = to_int(request.args.get('per_page'), 'per_page', default=20, min_value=1, max_value=100)
     start_date = request.args.get('start_date')
     end_date = request.args.get('end_date')
 

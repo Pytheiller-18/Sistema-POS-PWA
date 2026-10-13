@@ -23,9 +23,10 @@ class Sale(db.Model):
 
     __table_args__ = (
         db.UniqueConstraint('tenant_id', 'client_sync_id', name='uk_tenant_client_sync'),
+        db.UniqueConstraint('tenant_id', 'invoice_number', name='uk_tenant_invoice_number'),
     )
 
-    items = db.relationship('SaleItem', backref='sale', lazy='joined', cascade='all, delete-orphan')
+    items = db.relationship('SaleItem', backref='sale', lazy='selectin', cascade='all, delete-orphan')
     user = db.relationship('User', backref='sales', lazy='joined')
 
     def to_dict(self, include_items=True):
@@ -66,7 +67,7 @@ class SaleItem(db.Model):
     subtotal = db.Column(db.Numeric(12, 2), nullable=False, default=0.00)
     total = db.Column(db.Numeric(12, 2), nullable=False, default=0.00)
 
-    product = db.relationship('Product', backref='sale_items', lazy='joined')
+    product = db.relationship('Product', backref='sale_items', lazy='selectin')
 
     def to_dict(self):
         return {

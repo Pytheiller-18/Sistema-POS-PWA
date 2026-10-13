@@ -3,6 +3,7 @@ from datetime import datetime, timezone, timedelta
 from functools import wraps
 from flask import request, jsonify, g, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
+from app.extensions import db
 
 # ============================================================================
 # DOBLE VERIFICACIÓN DE SEGURIDAD - AUTENTICACIÓN Y MULTI-TENANCY:
@@ -89,6 +90,27 @@ def tenant_required(allowed_roles=None):
                     'success': False,
                     'error': 'Token incompleto: falta información de tienda o usuario.'
                 }), 403
+
+            # (A10) Revalidación en vivo: un token firmado no basta si el usuario
+            # fue desactivado o la tienda suspendida después de emitirlo.
+            from app.models.user import User
+            from app.models.tenant import Tenant
+            row = db.session.query(User.is_active, User.role, Tenant.status)\
+                .join(Tenant, Tenant.id == User.tenant_id)\
+                .filter(User.id == g.user_id, User.tenant_id == g.tenant_id)\
+                .first()
+            if not row or not row.is_active:
+                return jsonify({
+                    'success': False,
+                    'error': 'Usuario inactivo o inexistente. Inicie sesión nuevamente.'
+                }), 401
+            if row.status not in ('ACTIVE', 'TRIAL'):
+                return jsonify({
+                    'success': False,
+                    'error': 'La tienda asociada se encuentra suspendida.'
+                }), 403
+            # El rol vigente en BD prevalece sobre el del token (degradaciones inmediatas)
+            g.user_role = row.role
 
             # Doble verificación de roles autorizados si se especificaron
             if allowed_roles:

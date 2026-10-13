@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sistema-pos-pwa-v2';
+const CACHE_NAME = 'sistema-pos-pwa-v3';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -41,8 +41,8 @@ self.addEventListener('activate', (event) => {
 });
 
 // Estrategia Fetch:
-// - Para recursos estáticos: Cache-First con actualización en segundo plano
 // - Para llamadas de API (/api/): Network-First
+// - Para recursos estáticos GET: Cache-First con actualización en segundo plano
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
@@ -60,6 +60,11 @@ self.addEventListener('fetch', (event) => {
         });
       })
     );
+    return;
+  }
+
+  // (O7) Solo peticiones GET pueden ser cacheadas
+  if (event.request.method !== 'GET') {
     return;
   }
 

@@ -5,7 +5,9 @@
 
 class PosApiClient {
   constructor() {
-    this.baseUrl = window.API_BASE_URL || 'http://localhost:5000/api/v1';
+    const isHttp = typeof window !== 'undefined' && window.location && window.location.origin && window.location.origin.startsWith('http');
+    const defaultOrigin = isHttp ? `${window.location.origin}/api/v1` : 'http://localhost:5000/api/v1';
+    this.baseUrl = window.API_BASE_URL || defaultOrigin;
     this.token = localStorage.getItem('pos_pwa_token') || null;
     this.tenant = JSON.parse(localStorage.getItem('pos_pwa_tenant') || 'null');
     this.user = JSON.parse(localStorage.getItem('pos_pwa_user') || 'null');
