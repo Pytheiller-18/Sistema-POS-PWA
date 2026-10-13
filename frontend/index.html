@@ -472,7 +472,7 @@
   <div id="scanner-modal" class="modal-overlay">
     <div class="scanner-modal-content">
       <div class="modal-header">
-        <h3 id="scanner-modal-title" class="modal-title">Escanear Código de Barras / QR</h3>
+        <h3 id="scanner-modal-title" class="modal-title">Escanear Código de Barras</h3>
         <button id="scanner-modal-close" class="modal-close-btn">&times;</button>
       </div>
 
@@ -484,11 +484,11 @@
       </div>
 
       <div class="scanner-controls-bar">
-        <button type="button" id="btn-scanner-toggle-mirror" class="btn btn-secondary btn-sm" title="Invertir / Modo Espejo de Cámara">
-          🪞 Modo Espejo
-        </button>
         <button type="button" id="btn-scanner-toggle-torch" class="btn btn-secondary btn-sm" title="Encender Linterna">
           🔦 Linterna
+        </button>
+        <button type="button" id="btn-scanner-toggle-mirror" class="btn btn-secondary btn-sm" title="Invertir vista horizontalmente (modo espejo)">
+          🪞 Invertir Vista
         </button>
         <button type="button" id="btn-scanner-flip-camera" class="btn btn-secondary btn-sm" title="Cambiar Cámara">
           🔄 Cambiar Cámara
@@ -499,7 +499,7 @@
       </div>
 
       <div id="scanner-last-detected" class="scanner-status-hint">
-        Apunta la cámara o webcam al código QR o de barras
+        Apunta la cámara trasera o webcam al código de barras del producto
       </div>
     </div>
   </div>

@@ -13,7 +13,7 @@ class PosApp {
     this.currentSaleCompleted = null;
     this.isSubmittingSale = false;
 
-    // Escáner de código de barras y códigos QR
+    // Escáner de código de barras
     this.html5QrCode = null;
     this.scannerContext = 'POS'; // 'POS' o 'PRODUCT'
     this.availableCameras = [];
@@ -22,10 +22,7 @@ class PosApp {
     this.isTorchOn = false;
     this.lastScannedCode = null;
     this.lastScannedTime = 0;
-
-    // Inversión / Modo Espejo de Cámara (persistente en localStorage)
-    const savedMirror = localStorage.getItem('pos_scanner_mirror');
-    this.isCameraMirrored = savedMirror !== null ? savedMirror === 'true' : true;
+    this.isScannerMirrored = localStorage.getItem('pos_scanner_mirror') === 'true';
 
     // Sintetizador de audio para escaneo (Web Audio API)
     this.audioCtx = null;
@@ -50,7 +47,6 @@ class PosApp {
 
   async init() {
     this.initTheme();
-    this.applyCameraMirrorUI();
     this.registerServiceWorker();
     this.bindEvents();
     this.checkSession();
@@ -365,45 +361,7 @@ class PosApp {
     }
   }
 
-  // --- Inversión / Modo Espejo de Cámara (PWA / UX) ---
-  toggleCameraMirror() {
-    this.isCameraMirrored = !this.isCameraMirrored;
-    try {
-      localStorage.setItem('pos_scanner_mirror', this.isCameraMirrored ? 'true' : 'false');
-    } catch (e) {
-      console.warn('No se pudo guardar la preferencia de espejo:', e);
-    }
-    this.applyCameraMirrorUI();
-    this.showToast(
-      this.isCameraMirrored ? '🪞 Modo espejo activado (vista natural)' : '🪞 Modo espejo desactivado (vista normal)',
-      'info'
-    );
-  }
-
-  applyCameraMirrorUI() {
-    const viewport = document.getElementById('scanner-viewport');
-    if (viewport) {
-      if (this.isCameraMirrored) {
-        viewport.classList.add('is-mirrored');
-      } else {
-        viewport.classList.remove('is-mirrored');
-      }
-    }
-    const mirrorBtn = document.getElementById('btn-scanner-toggle-mirror');
-    if (mirrorBtn) {
-      if (this.isCameraMirrored) {
-        mirrorBtn.innerHTML = '🪞 Espejo: <b>ON</b>';
-        mirrorBtn.classList.add('scanner-btn-active');
-        mirrorBtn.setAttribute('title', 'Modo espejo activado (haz clic para desactivar)');
-      } else {
-        mirrorBtn.innerHTML = '🪞 Espejo: <b>OFF</b>';
-        mirrorBtn.classList.remove('scanner-btn-active');
-        mirrorBtn.setAttribute('title', 'Modo espejo desactivado (haz clic para activar)');
-      }
-    }
-  }
-
-  // --- Escáner de Códigos de Barras y QR con Cámara (PWA / Html5Qrcode) ---
+  // --- Escáner de Códigos de Barras con Cámara (PWA / Html5Qrcode) ---
   async openBarcodeScanner(context = 'POS') {
     this.scannerContext = context;
     const modalTitle = document.getElementById('scanner-modal-title');
@@ -413,11 +371,11 @@ class PosApp {
       modalTitle.textContent = context === 'POS' ? '📷 Escanear Producto (Caja)' : '📷 Escanear Código (Inventario)';
     }
     if (lastDetected) {
-      lastDetected.textContent = 'Apunta la cámara al código QR o de barras...';
+      lastDetected.textContent = 'Apunta la cámara al código de barras del producto...';
     }
 
-    this.applyCameraMirrorUI();
     document.getElementById('scanner-modal').classList.add('active');
+    this.applyScannerMirror();
 
     try {
       if (!window.Html5Qrcode) {
@@ -426,12 +384,7 @@ class PosApp {
       }
 
       if (!this.html5QrCode) {
-        this.html5QrCode = new Html5Qrcode("scanner-viewport", {
-          experimentalFeatures: {
-            useBarCodeDetectorIfSupported: true
-          },
-          verbose: false
-        });
+        this.html5QrCode = new Html5Qrcode("scanner-viewport");
       }
 
       try {
@@ -440,16 +393,13 @@ class PosApp {
         this.availableCameras = [];
       }
 
-      // Configuración optimizada para lectura de códigos QR de pantallas y códigos 1D
       const config = {
-        fps: 20,
-        qrbox: (viewfinderWidth, viewfinderHeight) => {
-          // Área cuadrada centrada para capturar los 3 patrones de esquina de un QR completo y códigos de barras
-          const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
-          const boxSize = Math.max(200, Math.min(Math.floor(minEdge * 0.8), 280));
-          return { width: boxSize, height: boxSize };
-        },
-        disableFlip: false // Permite decodificar en ambas orientaciones para máxima tasa de éxito
+        fps: 15,
+        qrbox: { width: 260, height: 160 },
+        aspectRatio: 1.0,
+        experimentalFeatures: {
+          useBarCodeDetectorIfSupported: true
+        }
       };
 
       let cameraConfig = { facingMode: "environment" }; // Preferir cámara trasera en celulares
@@ -471,7 +421,7 @@ class PosApp {
         () => {} // Ignorar frames sin código
       );
       this.isScanning = true;
-      this.applyCameraMirrorUI();
+      this.applyScannerMirror();
     } catch (err) {
       console.warn('Error al iniciar cámara para escáner:', err);
       if (lastDetected) {
@@ -519,6 +469,36 @@ class PosApp {
     await this.stopBarcodeScanner();
     this.currentCameraIndex = (this.currentCameraIndex + 1) % this.availableCameras.length;
     await this.openBarcodeScanner(this.scannerContext);
+  }
+
+  toggleScannerMirror() {
+    this.isScannerMirrored = !this.isScannerMirrored;
+    localStorage.setItem('pos_scanner_mirror', this.isScannerMirrored ? 'true' : 'false');
+    this.applyScannerMirror();
+    this.showToast(this.isScannerMirrored ? 'Vista invertida (modo espejo)' : 'Vista normal (sin espejo)', 'info');
+  }
+
+  applyScannerMirror() {
+    const viewport = document.getElementById('scanner-viewport');
+    const mirrorBtn = document.getElementById('btn-scanner-toggle-mirror');
+    if (viewport) {
+      if (this.isScannerMirrored) {
+        viewport.classList.add('scanner-mirrored');
+      } else {
+        viewport.classList.remove('scanner-mirrored');
+      }
+    }
+    if (mirrorBtn) {
+      if (this.isScannerMirrored) {
+        mirrorBtn.classList.add('active');
+        mirrorBtn.innerHTML = '🪞 Espejo: Activo';
+        mirrorBtn.title = 'Hacer clic para volver a vista normal';
+      } else {
+        mirrorBtn.classList.remove('active');
+        mirrorBtn.innerHTML = '🪞 Invertir Vista';
+        mirrorBtn.title = 'Invertir vista horizontalmente (modo espejo)';
+      }
+    }
   }
 
   onBarcodeDetected(code) {
@@ -1152,11 +1132,6 @@ class PosApp {
       btnScanClose.addEventListener('click', () => this.stopBarcodeScanner());
     }
 
-    const btnMirror = document.getElementById('btn-scanner-toggle-mirror');
-    if (btnMirror) {
-      btnMirror.addEventListener('click', () => this.toggleCameraMirror());
-    }
-
     const btnTorch = document.getElementById('btn-scanner-toggle-torch');
     if (btnTorch) {
       btnTorch.addEventListener('click', () => this.toggleTorch());
@@ -1165,6 +1140,11 @@ class PosApp {
     const btnFlip = document.getElementById('btn-scanner-flip-camera');
     if (btnFlip) {
       btnFlip.addEventListener('click', () => this.flipCamera());
+    }
+
+    const btnMirror = document.getElementById('btn-scanner-toggle-mirror');
+    if (btnMirror) {
+      btnMirror.addEventListener('click', () => this.toggleScannerMirror());
     }
 
     // Búsqueda en caja (Input y soporte para lector de código de barras físico USB/Bluetooth)
