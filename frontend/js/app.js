@@ -12,10 +12,24 @@ class PosApp {
     this.activeDiscount = 0;
     this.currentSaleCompleted = null;
 
+    // Escáner de código de barras
+    this.html5QrCode = null;
+    this.scannerContext = 'POS'; // 'POS' o 'PRODUCT'
+    this.availableCameras = [];
+    this.currentCameraIndex = 0;
+    this.isScanning = false;
+    this.isTorchOn = false;
+    this.lastScannedCode = null;
+    this.lastScannedTime = 0;
+
+    // Sintetizador de audio para escaneo (Web Audio API)
+    this.audioCtx = null;
+
     this.init();
   }
 
   async init() {
+    this.initTheme();
     this.registerServiceWorker();
     this.bindEvents();
     this.checkSession();
@@ -240,7 +254,249 @@ class PosApp {
     `).join('');
   }
 
-  // --- Proceso de Cobro (Checkout Modal) ---
+  // --- Notificaciones & Audio Sintetizado (Offline) ---
+  playBeep(type = 'success') {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      if (!this.audioCtx) this.audioCtx = new AudioCtx();
+      if (this.audioCtx.state === 'suspended') {
+        this.audioCtx.resume();
+      }
+
+      const osc = this.audioCtx.createOscillator();
+      const gain = this.audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(this.audioCtx.destination);
+
+      if (type === 'success') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, this.audioCtx.currentTime); // Nota La5 (Beep de POS clásico)
+        gain.gain.setValueAtTime(0.18, this.audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.audioCtx.currentTime + 0.12);
+        osc.start();
+        osc.stop(this.audioCtx.currentTime + 0.12);
+      } else {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(320, this.audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.2, this.audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.audioCtx.currentTime + 0.22);
+        osc.start();
+        osc.stop(this.audioCtx.currentTime + 0.22);
+      }
+    } catch (e) {
+      console.warn('Audio no disponible:', e);
+    }
+  }
+
+  showToast(message, type = 'success') {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+    const toast = document.createElement('div');
+    toast.className = `toast-message ${type}`;
+    const icon = type === 'success' ? '✓' : (type === 'warning' ? '⚠️' : 'ℹ️');
+    toast.innerHTML = `<span style="font-weight:900;">${icon}</span> <span>${message}</span>`;
+    container.appendChild(toast);
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(10px)';
+      toast.style.transition = 'all 0.3s ease';
+      setTimeout(() => toast.remove(), 300);
+    }, 2500);
+  }
+
+  // --- Gestión de Tema Claro / Oscuro ---
+  initTheme() {
+    const savedTheme = localStorage.getItem('pos_pwa_theme') || 'dark';
+    this.applyTheme(savedTheme);
+  }
+
+  toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    this.applyTheme(newTheme);
+  }
+
+  applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('pos_pwa_theme', theme);
+
+    const sunIcon = document.getElementById('icon-theme-sun');
+    const moonIcon = document.getElementById('icon-theme-moon');
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+
+    if (theme === 'light') {
+      if (sunIcon) sunIcon.style.display = 'none';
+      if (moonIcon) moonIcon.style.display = 'block';
+      if (metaThemeColor) metaThemeColor.setAttribute('content', '#f1f5f9');
+    } else {
+      if (sunIcon) sunIcon.style.display = 'block';
+      if (moonIcon) moonIcon.style.display = 'none';
+      if (metaThemeColor) metaThemeColor.setAttribute('content', '#0b0f19');
+    }
+  }
+
+  // --- Escáner de Códigos de Barras con Cámara (PWA / Html5Qrcode) ---
+  async openBarcodeScanner(context = 'POS') {
+    this.scannerContext = context;
+    const modalTitle = document.getElementById('scanner-modal-title');
+    const lastDetected = document.getElementById('scanner-last-detected');
+
+    if (modalTitle) {
+      modalTitle.textContent = context === 'POS' ? '📷 Escanear Producto (Caja)' : '📷 Escanear Código (Inventario)';
+    }
+    if (lastDetected) {
+      lastDetected.textContent = 'Apunta la cámara al código de barras del producto...';
+    }
+
+    document.getElementById('scanner-modal').classList.add('active');
+
+    try {
+      if (!window.Html5Qrcode) {
+        alert('Librería de escaneo no disponible.');
+        return;
+      }
+
+      if (!this.html5QrCode) {
+        this.html5QrCode = new Html5Qrcode("scanner-viewport");
+      }
+
+      try {
+        this.availableCameras = await Html5Qrcode.getCameras();
+      } catch (err) {
+        this.availableCameras = [];
+      }
+
+      const config = {
+        fps: 15,
+        qrbox: { width: 260, height: 160 },
+        aspectRatio: 1.0,
+        experimentalFeatures: {
+          useBarCodeDetectorIfSupported: true
+        }
+      };
+
+      let cameraConfig = { facingMode: "environment" }; // Preferir cámara trasera en celulares
+      if (this.availableCameras && this.availableCameras.length > 0) {
+        const backCam = this.availableCameras.find((c) =>
+          c.label.toLowerCase().includes('back') || c.label.toLowerCase().includes('trasera') || c.label.toLowerCase().includes('posterior')
+        );
+        if (backCam) {
+          cameraConfig = backCam.id;
+        } else {
+          cameraConfig = this.availableCameras[this.currentCameraIndex % this.availableCameras.length].id;
+        }
+      }
+
+      await this.html5QrCode.start(
+        cameraConfig,
+        config,
+        (decodedText) => this.onBarcodeDetected(decodedText),
+        () => {} // Ignorar frames sin código
+      );
+      this.isScanning = true;
+    } catch (err) {
+      console.warn('Error al iniciar cámara para escáner:', err);
+      if (lastDetected) {
+        lastDetected.innerHTML = `<span style="color: var(--danger);">⚠️ No se pudo acceder a la cámara: ${err.message || 'Permiso denegado'}</span>`;
+      }
+    }
+  }
+
+  async stopBarcodeScanner() {
+    if (this.html5QrCode && this.isScanning) {
+      try {
+        await this.html5QrCode.stop();
+      } catch (e) {
+        console.warn('Error al detener escáner:', e);
+      }
+      this.isScanning = false;
+    }
+    this.isTorchOn = false;
+    const modal = document.getElementById('scanner-modal');
+    if (modal) modal.classList.remove('active');
+  }
+
+  async toggleTorch() {
+    if (!this.html5QrCode || !this.isScanning) return;
+    try {
+      this.isTorchOn = !this.isTorchOn;
+      await this.html5QrCode.applyVideoConstraints({
+        advanced: [{ torch: this.isTorchOn }]
+      });
+      const torchBtn = document.getElementById('btn-scanner-toggle-torch');
+      if (torchBtn) {
+        torchBtn.textContent = this.isTorchOn ? '🔦 Apagar Linterna' : '🔦 Linterna';
+      }
+    } catch (e) {
+      console.warn('Linterna no soportada en este dispositivo:', e);
+      this.showToast('Linterna no compatible en este sensor', 'warning');
+    }
+  }
+
+  async flipCamera() {
+    if (!this.availableCameras || this.availableCameras.length < 2) {
+      this.showToast('Solo hay 1 cámara disponible en este dispositivo', 'warning');
+      return;
+    }
+    await this.stopBarcodeScanner();
+    this.currentCameraIndex = (this.currentCameraIndex + 1) % this.availableCameras.length;
+    await this.openBarcodeScanner(this.scannerContext);
+  }
+
+  onBarcodeDetected(code) {
+    const cleanCode = String(code).trim();
+    if (!cleanCode) return;
+
+    const now = Date.now();
+    // Debounce: evitar lecturas duplicadas en menos de 1.4 segundos para el mismo código
+    if (this.lastScannedCode === cleanCode && (now - this.lastScannedTime) < 1400) {
+      return;
+    }
+    this.lastScannedCode = cleanCode;
+    this.lastScannedTime = now;
+
+    const continuousCheckbox = document.getElementById('scanner-continuous-mode');
+    const isContinuous = continuousCheckbox ? continuousCheckbox.checked : false;
+
+    if (this.scannerContext === 'POS') {
+      const codeLower = cleanCode.toLowerCase();
+      const product = this.products.find((p) => p.is_active && (
+        (p.barcode && String(p.barcode).trim().toLowerCase() === codeLower) ||
+        p.id.toLowerCase() === codeLower
+      ));
+
+      if (product) {
+        this.playBeep('success');
+        this.addToCart(product);
+        this.showToast(`Agregado: ${product.name}`, 'success');
+        const lastDetected = document.getElementById('scanner-last-detected');
+        if (lastDetected) {
+          lastDetected.innerHTML = `<strong style="color: var(--success);">✓ ${product.name}</strong> ($${Number(product.sale_price).toLocaleString()})`;
+        }
+        if (!isContinuous) {
+          setTimeout(() => this.stopBarcodeScanner(), 600);
+        }
+      } else {
+        this.playBeep('warning');
+        this.showToast(`Código [${cleanCode}] no registrado`, 'warning');
+        const lastDetected = document.getElementById('scanner-last-detected');
+        if (lastDetected) {
+          lastDetected.innerHTML = `<span style="color: var(--warning);">⚠️ Código [${cleanCode}] no encontrado en catálogo</span>`;
+        }
+      }
+    } else if (this.scannerContext === 'PRODUCT') {
+      this.playBeep('success');
+      const barcodeInput = document.getElementById('product-form-barcode');
+      if (barcodeInput) {
+        barcodeInput.value = cleanCode;
+      }
+      this.showToast(`Código asignado: ${cleanCode}`, 'success');
+      setTimeout(() => this.stopBarcodeScanner(), 500);
+    }
+  }
+
+  // --- Proceso de Cobro y Cálculo Dinámico de Cambio (Checkout) ---
   openCheckoutModal() {
     if (this.cart.length === 0) return;
 
@@ -248,30 +504,139 @@ class PosApp {
     document.getElementById('checkout-total-display').textContent = `$${total.toLocaleString()}`;
     const paidInput = document.getElementById('checkout-paid-amount');
     paidInput.value = total;
+
+    document.getElementById('checkout-payment-method').value = 'CASH';
+    this.renderSmartDenominations(total);
     this.calculateChange();
 
     document.getElementById('checkout-modal').classList.add('active');
   }
 
+  renderSmartDenominations(total) {
+    const container = document.getElementById('checkout-smart-denominations');
+    if (!container) return;
+
+    if (total <= 0) {
+      container.innerHTML = '<button type="button" class="cash-pill-btn active" onclick="window.posApp.setQuickCash(\'EXACT\')">Exacto ($0)</button>';
+      return;
+    }
+
+    const suggestions = new Set();
+    suggestions.add(total); // Pago exacto
+
+    [1000, 2000, 5000, 10000, 20000, 50000, 100000].forEach((denom) => {
+      if (denom > total) {
+        suggestions.add(denom);
+      } else {
+        const nextMultiple = Math.ceil(total / denom) * denom;
+        if (nextMultiple > total) suggestions.add(nextMultiple);
+      }
+    });
+
+    [10000, 20000, 50000, 100000].forEach((b) => {
+      if (b >= total) suggestions.add(b);
+    });
+
+    const sorted = Array.from(suggestions).sort((a, b) => a - b).slice(0, 5);
+
+    let html = `<button type="button" class="cash-pill-btn active" onclick="window.posApp.setQuickCash('EXACT')">Exacto ($${total.toLocaleString()})</button>`;
+    sorted.forEach((val) => {
+      if (val !== total) {
+        html += `<button type="button" class="cash-pill-btn" onclick="window.posApp.setQuickCash(${val})">$${val.toLocaleString()}</button>`;
+      }
+    });
+
+    container.innerHTML = html;
+  }
+
   calculateChange() {
     const { total } = this.calculateCartTotals();
-    const paid = Number(document.getElementById('checkout-paid-amount').value) || 0;
-    const change = Math.max(0, paid - total);
-    document.getElementById('checkout-change-display').textContent = `$${change.toLocaleString()}`;
+    const method = document.getElementById('checkout-payment-method').value;
+    const paidInput = document.getElementById('checkout-paid-amount');
+    const cardEl = document.getElementById('checkout-change-card');
+    const titleEl = document.getElementById('checkout-change-title');
+    const subtitleEl = document.getElementById('checkout-change-subtitle');
+    const amountEl = document.getElementById('checkout-change-display');
+    const confirmBtn = document.getElementById('btn-confirm-sale');
+    const cashSection = document.getElementById('cash-payment-section');
+
+    if (method !== 'CASH') {
+      if (cashSection) cashSection.style.display = 'none';
+      if (cardEl) {
+        cardEl.className = 'checkout-change-card change-exact';
+        if (titleEl) titleEl.textContent = 'Pago Electrónico:';
+        if (subtitleEl) subtitleEl.textContent = 'Sin devuelta en efectivo';
+        if (amountEl) amountEl.textContent = `$${total.toLocaleString()}`;
+      }
+      confirmBtn.disabled = false;
+      return;
+    }
+
+    if (cashSection) cashSection.style.display = 'block';
+
+    const paid = Number(paidInput.value) || 0;
+    const difference = paid - total;
+
+    // Resaltar botón activo en las denominaciones si coincide
+    document.querySelectorAll('#checkout-smart-denominations .cash-pill-btn').forEach((btn) => {
+      if (paid === total && btn.textContent.includes('Exacto')) {
+        btn.classList.add('active');
+      } else if (btn.textContent.includes(paid.toLocaleString()) && !btn.textContent.includes('Exacto')) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
+    if (difference > 0) {
+      if (cardEl) cardEl.className = 'checkout-change-card change-positive';
+      if (titleEl) titleEl.textContent = 'Cambio / Devuelta a Entregar:';
+      if (subtitleEl) subtitleEl.textContent = 'Entregar al cliente';
+      if (amountEl) amountEl.textContent = `$${difference.toLocaleString()}`;
+      confirmBtn.disabled = false;
+    } else if (difference === 0) {
+      if (cardEl) cardEl.className = 'checkout-change-card change-exact';
+      if (titleEl) titleEl.textContent = 'Pago Exacto:';
+      if (subtitleEl) subtitleEl.textContent = 'Sin devuelta en efectivo';
+      if (amountEl) amountEl.textContent = '$0';
+      confirmBtn.disabled = false;
+    } else {
+      if (cardEl) cardEl.className = 'checkout-change-card change-negative';
+      if (titleEl) titleEl.textContent = 'Monto Insuficiente (Faltante):';
+      if (subtitleEl) subtitleEl.textContent = 'Falta dinero para cubrir la venta';
+      if (amountEl) amountEl.textContent = `-$${Math.abs(difference).toLocaleString()}`;
+      confirmBtn.disabled = true; // Prohibir confirmación hasta cubrir la orden
+    }
   }
 
   setQuickCash(amount) {
     const { total } = this.calculateCartTotals();
     const input = document.getElementById('checkout-paid-amount');
-    input.value = amount === 'EXACT' ? total : amount;
+    const value = amount === 'EXACT' ? total : Number(amount);
+    input.value = value;
+    this.calculateChange();
+  }
+
+  addCashIncrement(amount) {
+    const input = document.getElementById('checkout-paid-amount');
+    const current = Number(input.value) || 0;
+    input.value = current + Number(amount);
     this.calculateChange();
   }
 
   async finalizeSale() {
     const { subtotal, tax, discount, total } = this.calculateCartTotals();
-    const paid = Number(document.getElementById('checkout-paid-amount').value) || total;
-    const change = Math.max(0, paid - total);
     const paymentMethod = document.getElementById('checkout-payment-method').value;
+    let paid = Number(document.getElementById('checkout-paid-amount').value) || total;
+
+    if (paymentMethod !== 'CASH') {
+      paid = total;
+    } else if (paid < total) {
+      alert('El monto pagado en efectivo es insuficiente para completar la venta.');
+      return;
+    }
+
+    const change = Math.max(0, paid - total);
 
     const clientSyncId = 'pos-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
     const invoiceNumber = 'POS-' + new Date().getFullYear() + '-' + Math.floor(100000 + Math.random() * 900000);
@@ -643,12 +1008,61 @@ class PosApp {
       tab.addEventListener('click', () => this.switchView(tab.dataset.view));
     });
 
-    // Búsqueda en caja
+    // Selector de Tema (Claro / Oscuro)
+    const btnToggleTheme = document.getElementById('btn-toggle-theme');
+    if (btnToggleTheme) {
+      btnToggleTheme.addEventListener('click', () => this.toggleTheme());
+    }
+
+    // Escáner de Códigos de Barras (Cámara)
+    const btnScanPos = document.getElementById('btn-open-scanner-pos');
+    if (btnScanPos) {
+      btnScanPos.addEventListener('click', () => this.openBarcodeScanner('POS'));
+    }
+
+    const btnScanProd = document.getElementById('btn-open-scanner-prod');
+    if (btnScanProd) {
+      btnScanProd.addEventListener('click', () => this.openBarcodeScanner('PRODUCT'));
+    }
+
+    const btnScanClose = document.getElementById('scanner-modal-close');
+    if (btnScanClose) {
+      btnScanClose.addEventListener('click', () => this.stopBarcodeScanner());
+    }
+
+    const btnTorch = document.getElementById('btn-scanner-toggle-torch');
+    if (btnTorch) {
+      btnTorch.addEventListener('click', () => this.toggleTorch());
+    }
+
+    const btnFlip = document.getElementById('btn-scanner-flip-camera');
+    if (btnFlip) {
+      btnFlip.addEventListener('click', () => this.flipCamera());
+    }
+
+    // Búsqueda en caja (Input y soporte para lector de código de barras físico USB/Bluetooth)
     const searchInput = document.getElementById('pos-search-input');
     if (searchInput) {
       searchInput.addEventListener('input', (e) => {
         this.searchQuery = e.target.value;
         this.renderProductsGrid();
+      });
+
+      searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          const val = searchInput.value.trim().toLowerCase();
+          if (val) {
+            const exactProduct = this.products.find((p) => p.is_active && p.barcode && String(p.barcode).trim().toLowerCase() === val);
+            if (exactProduct) {
+              this.addToCart(exactProduct);
+              this.playBeep('success');
+              this.showToast(`Agregado: ${exactProduct.name}`, 'success');
+              searchInput.value = '';
+              this.searchQuery = '';
+              this.renderProductsGrid();
+            }
+          }
+        }
       });
     }
 
@@ -661,6 +1075,10 @@ class PosApp {
 
     // Checkout Modal
     document.getElementById('checkout-paid-amount').addEventListener('input', () => this.calculateChange());
+    const paymentSelect = document.getElementById('checkout-payment-method');
+    if (paymentSelect) {
+      paymentSelect.addEventListener('change', () => this.calculateChange());
+    }
     document.getElementById('btn-confirm-sale').addEventListener('click', () => this.finalizeSale());
     document.getElementById('checkout-modal-close').addEventListener('click', () => {
       document.getElementById('checkout-modal').classList.remove('active');

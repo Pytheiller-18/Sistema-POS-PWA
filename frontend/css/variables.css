@@ -1,5 +1,5 @@
 :root {
-  /* Paleta cromática moderna y de alto contraste (Dark Tech Theme) */
+  /* Paleta cromática moderna y de alto contraste (Dark Tech Theme por defecto) */
   --bg-body: #0b0f19;
   --bg-surface: #111827;
   --bg-card: #1f2937;
@@ -38,4 +38,41 @@
   /* Tipografía */
   --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Transición de Tema */
+  --theme-transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+}
+
+[data-theme="light"] {
+  /* Paleta Tema Claro Premium (Clean Modern POS) */
+  --bg-body: #f1f5f9;
+  --bg-surface: #ffffff;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f8fafc;
+  --bg-input: #f8fafc;
+
+  /* Acentos */
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --primary-light: rgba(79, 70, 229, 0.12);
+  --accent-cyan: #0284c7;
+  --success: #16a34a;
+  --success-light: rgba(22, 163, 74, 0.12);
+  --warning: #d97706;
+  --warning-light: rgba(217, 119, 6, 0.12);
+  --danger: #dc2626;
+  --danger-light: rgba(220, 38, 38, 0.12);
+
+  /* Texto */
+  --text-main: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+
+  /* Bordes y Sombras */
+  --border-color: #e2e8f0;
+  --border-focus: #4f46e5;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+  --shadow-glow: 0 0 20px rgba(79, 70, 229, 0.18);
 }

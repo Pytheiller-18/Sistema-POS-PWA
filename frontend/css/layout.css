@@ -14,6 +14,7 @@ body {
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
+  transition: var(--theme-transition);
 }
 
 /* Header & Navbar */
@@ -28,6 +29,7 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+  transition: var(--theme-transition);
 }
 
 .brand-section {

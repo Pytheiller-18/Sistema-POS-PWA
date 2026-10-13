@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sistema-pos-pwa-v1';
+const CACHE_NAME = 'sistema-pos-pwa-v2';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -6,6 +6,7 @@ const STATIC_ASSETS = [
   './css/variables.css',
   './css/layout.css',
   './css/components.css',
+  './js/vendor/html5-qrcode.min.js',
   './js/db.js',
   './js/api.js',
   './js/sync.js',

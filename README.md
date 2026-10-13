@@ -26,10 +26,19 @@
    - Prevención exhaustiva de vulnerabilidades IDOR (*Insecure Direct Object References*).
 
 3. **Adaptabilidad Total (Móvil & Escritorio):**
-   - **Vista Celular:** Diseño táctil ultra-rápido, chips de categoría deslizables, escáner simulado y carrito flotante tipo cajón inferior.
+   - **Vista Celular:** Diseño táctil ultra-rápido, chips de categoría deslizables, escáner de cámara integrado y carrito flotante tipo cajón inferior.
    - **Vista Computador (Escritorio):** Pantalla partida clásica de caja (*Dual-Pane*), catálogo a la izquierda y panel de orden/cobro permanente a la derecha con atajos rápidos de efectivo.
+   - **Soporte de Tema Dual (Claro & Oscuro):** Interfaz personalizable mediante selector en encabezado con paleta de alto contraste y persistencia local.
 
-4. **Analíticas y Reportes de Ganancias:**
+4. **Lector de Códigos de Barras por Cámara (Offline-First):**
+   - Escaneo directo mediante cámara trasera en celulares o webcam en PC/laptops.
+   - Detección instantánea con visor y láser animado, linterna (*torch*), conmutación de cámaras y pitido sonoro (*beep*) sintetizado vía Web Audio API.
+   - Doble flujo operativo: ingreso directo a la orden en caja POS (soporta también lectores físicos USB/Bluetooth) y captura automática de SKU en inventario.
+
+5. **Cobro Inteligente y Cálculo Reactivo de Devuelta:**
+   - Sugerencias automáticas de billetes según el total a pagar, incrementos táctiles (`+$1.000` a `+$50.000`) y visualización en tiempo real de devuelta o saldo faltante.
+
+6. **Analíticas y Reportes de Ganancias:**
    - Métricas en tiempo real: Ventas del día, ticket promedio, ventas acumuladas del mes (comparativa con mes previo), desglose anual de 12 meses, top 5 productos de mayor rotación y cálculo de utilidad neta (`Ingresos - Costos Históricos`).
 
 ---
@@ -79,6 +88,8 @@ SISTEMA-POS-PWA/
 │   │   ├── layout.css                         # Grids responsivos (Mobile & Desktop Dual-Pane)
 │   │   └── components.css                     # Tarjetas, teclado de cobro, modales y ticket impreso
 │   └── js/
+│       ├── vendor/
+│       │   └── html5-qrcode.min.js            # Motor local de escaneo de códigos de barras por cámara
 │       ├── db.js                              # Envoltorio IndexedDB (almacén local del catálogo y cola)
 │       ├── api.js                             # Cliente HTTP con JWT y detección de fallos
 │       ├── sync.js                            # Gestor de sincronización offline y deltas

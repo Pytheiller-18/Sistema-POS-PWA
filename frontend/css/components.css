@@ -18,6 +18,7 @@
   background-color: var(--primary);
   color: #fff;
 }
+
 .btn-primary:hover {
   background-color: var(--primary-hover);
   box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
@@ -28,6 +29,7 @@
   color: #0b0f19;
   font-weight: 700;
 }
+
 .btn-success:hover {
   background-color: #059669;
   color: #fff;
@@ -38,6 +40,7 @@
   color: var(--text-main);
   border-color: var(--border-color);
 }
+
 .btn-secondary:hover {
   background-color: var(--bg-card-hover);
 }
@@ -47,6 +50,7 @@
   color: var(--danger);
   border-color: rgba(239, 68, 68, 0.3);
 }
+
 .btn-danger:hover {
   background-color: var(--danger);
   color: #fff;
@@ -105,9 +109,20 @@
 }
 
 @keyframes pulse {
-  0% { transform: scale(0.95); opacity: 0.8; }
-  50% { transform: scale(1.2); opacity: 1; }
-  100% { transform: scale(0.95); opacity: 0.8; }
+  0% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
 }
 
 .sync-badge {
@@ -210,10 +225,12 @@
   background: var(--success-light);
   color: var(--success);
 }
+
 .stock-low {
   background: var(--warning-light);
   color: var(--warning);
 }
+
 .stock-empty {
   background: var(--danger-light);
   color: var(--danger);
@@ -386,6 +403,7 @@
   padding: 4px;
   border-radius: 4px;
 }
+
 .cart-item-remove:hover {
   background: var(--danger-light);
 }
@@ -410,7 +428,7 @@
 .summary-row.total-row {
   font-size: 1.35rem;
   font-weight: 900;
-  color: #fff;
+  color: var(--text-main);
   border-top: 1px solid var(--border-color);
   padding-top: 0.65rem;
   margin-top: 0.65rem;
@@ -433,16 +451,25 @@
   background-color: var(--bg-surface);
   border: 1px solid var(--border-color);
   color: var(--text-main);
-  padding: 0.45rem 0.2rem;
+  padding: 0.55rem 0.3rem;
   border-radius: var(--radius-sm);
-  font-size: 0.75rem;
-  font-weight: 700;
+  font-size: 0.8rem;
+  font-weight: 800;
   cursor: pointer;
   text-align: center;
+  transition: all 0.15s ease;
 }
+
 .cash-pill-btn:hover {
   background-color: var(--bg-card-hover);
   border-color: var(--primary);
+}
+
+.cash-pill-btn.active {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.4);
 }
 
 /* Modales */
@@ -521,6 +548,7 @@
   font-size: 0.9rem;
   outline: none;
 }
+
 .form-control:focus {
   border-color: var(--border-focus);
 }
@@ -589,7 +617,7 @@
 .kpi-value {
   font-size: 1.75rem;
   font-weight: 900;
-  color: #fff;
+  color: var(--text-main);
   letter-spacing: -0.025em;
 }
 
@@ -646,9 +674,12 @@
   body * {
     visibility: hidden;
   }
-  .ticket-wrapper, .ticket-wrapper * {
+
+  .ticket-wrapper,
+  .ticket-wrapper * {
     visibility: visible;
   }
+
   .ticket-wrapper {
     position: absolute;
     left: 0;
@@ -657,5 +688,291 @@
     max-width: 80mm;
     box-shadow: none;
     padding: 0;
+  }
+}
+
+/* =========================================================================
+   SELECTOR DE TEMA (CLARO / OSCURO)
+   ========================================================================= */
+.theme-toggle-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  padding: 0.4rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  width: 36px;
+  height: 36px;
+}
+
+.theme-toggle-btn:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-focus);
+  transform: translateY(-1px);
+}
+
+.theme-toggle-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* =========================================================================
+   BOTÓN Y MODAL DE ESCÁNER DE CÓDIGOS DE BARRAS (CÁMARA / PWA)
+   ========================================================================= */
+.btn-scanner {
+  background: linear-gradient(135deg, var(--primary), #3b82f6);
+  color: #fff;
+  border: none;
+  padding: 0 0.9rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-weight: 700;
+  font-size: 0.825rem;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
+}
+
+.btn-scanner:hover {
+  background: linear-gradient(135deg, var(--primary-hover), #2563eb);
+  transform: translateY(-1px);
+}
+
+.btn-scanner:active {
+  transform: translateY(0);
+}
+
+.btn-scanner-icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* Modal del Escáner */
+.scanner-modal-content {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 480px;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  padding: 1.25rem;
+}
+
+.scanner-viewport-wrapper {
+  position: relative;
+  width: 100%;
+  min-height: 280px;
+  max-height: 340px;
+  background: #000;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-color);
+}
+
+#scanner-viewport {
+  width: 100% !important;
+  border: none !important;
+}
+
+#scanner-viewport video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: var(--radius-md);
+}
+
+/* Visor / Láser Animado */
+.scanner-laser-overlay {
+  position: absolute;
+  top: 15%;
+  left: 12%;
+  right: 12%;
+  bottom: 15%;
+  border: 2px dashed rgba(6, 182, 212, 0.85);
+  border-radius: 12px;
+  pointer-events: none;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.4);
+}
+
+.scanner-laser-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2.5px;
+  background: #ef4444;
+  box-shadow: 0 0 12px #ef4444, 0 0 4px #f87171;
+  animation: laserScan 2s ease-in-out infinite alternate;
+}
+
+@keyframes laserScan {
+  0% { top: 6%; }
+  100% { top: 92%; }
+}
+
+.scanner-controls-bar {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.75rem;
+  padding: 0.25rem 0;
+}
+
+.scanner-status-hint {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+/* =========================================================================
+   ESTILOS DINÁMICOS DE COBRO Y CÁLCULO DE CAMBIO / DEVUELTA
+   ========================================================================= */
+.checkout-change-card {
+  padding: 1rem 1.25rem;
+  border-radius: var(--radius-md);
+  margin-bottom: 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.checkout-change-card.change-positive {
+  background: var(--success-light);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.checkout-change-card.change-negative {
+  background: var(--danger-light);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+.checkout-change-card.change-exact {
+  background: var(--primary-light);
+  border: 1px solid rgba(79, 70, 229, 0.35);
+}
+
+.change-label-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.change-label-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.change-label-subtitle {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.change-amount-display {
+  font-size: 1.65rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+.change-positive .change-amount-display {
+  color: var(--success);
+}
+
+.change-negative .change-amount-display {
+  color: var(--danger);
+}
+
+.change-exact .change-amount-display {
+  color: var(--primary);
+}
+
+.cash-increment-row {
+  display: flex;
+  gap: 0.35rem;
+  margin-top: 0.4rem;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+}
+
+.cash-inc-btn {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 0.3rem 0.55rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.72rem;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.cash-inc-btn:hover {
+  background-color: var(--primary-light);
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+/* =========================================================================
+   TOAST NOTIFICATIONS (AUDIO-VISUAL FEEDBACK AL ESCANEAR)
+   ========================================================================= */
+.toast-container {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  pointer-events: none;
+}
+
+.toast-message {
+  background: var(--bg-surface);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-lg);
+  padding: 0.75rem 1.15rem;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  pointer-events: auto;
+  animation: slideToast 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.toast-message.success {
+  border-color: rgba(16, 185, 129, 0.5);
+  background: var(--bg-surface);
+}
+
+.toast-message.warning {
+  border-color: rgba(245, 158, 11, 0.5);
+  background: var(--bg-surface);
+}
+
+@keyframes slideToast {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
