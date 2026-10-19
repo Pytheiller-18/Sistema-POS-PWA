@@ -43,7 +43,7 @@
 
 ---
 
-## 📑 Estructura de Directorios
+## 📑 Estructura de Directorios.
 
 El proyecto se encuentra desacoplado en dos módulos principales:
 
