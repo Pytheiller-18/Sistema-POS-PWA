@@ -1,5 +1,5 @@
 /**
- * SISTEMA POS PWA - Capa de Persistencia Local (IndexedDB)
+ * Positiva-POS - Capa de Persistencia Local (IndexedDB)
  * Proporciona almacenamiento transaccional offline-first en el navegador.
  */
 

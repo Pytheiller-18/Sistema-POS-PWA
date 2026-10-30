@@ -1,6 +1,6 @@
 {
-  "name": "SISTEMA POS PWA - Punto de Venta Offline-First",
-  "short_name": "SISTEMA POS PWA",
+  "name": "Positiva-POS - Punto de Venta Offline-First",
+  "short_name": "Positiva-POS",
   "description": "Sistema de Punto de Venta Ligero, Multi-Tenant y Offline-First con sincronización en la nube.",
   "start_url": "./index.html",
   "scope": "./",

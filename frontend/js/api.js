@@ -1,5 +1,5 @@
 /**
- * SISTEMA POS PWA - Cliente de API HTTP REST
+ * Positiva-POS - Cliente de API HTTP REST
  * Gestiona peticiones autenticadas, manejo de tokens JWT e intercepción de errores.
  */
 

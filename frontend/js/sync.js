@@ -1,5 +1,5 @@
 /**
- * SISTEMA POS PWA - Orquestador de Sincronización Offline-First
+ * Positiva-POS - Orquestador de Sincronización Offline-First
  * Gestiona el paso transparente entre modo local (IndexedDB) y la nube (API REST).
  * Soporta sincronización delta por ?since= y lotes fragmentados (O3, O4, C3).
  */

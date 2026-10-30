@@ -1,5 +1,5 @@
 /**
- * SISTEMA POS PWA - Coordinador Principal de Interfaz de Usuario y Lógica de Negocio
+ * Positiva-POS - Coordinador Principal de Interfaz de Usuario y Lógica de Negocio
  */
 
 class PosApp {

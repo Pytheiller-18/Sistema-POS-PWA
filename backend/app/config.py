@@ -52,10 +52,13 @@ class Config:
     MYSQL_PASSWORD = os.environ.get('MYSQL_PASSWORD', '')
     MYSQL_HOST = os.environ.get('MYSQL_HOST', 'localhost')
     MYSQL_PORT = os.environ.get('MYSQL_PORT', '3306')
-    MYSQL_DB = os.environ.get('MYSQL_DB', 'sistema_pos_pwa')
+    MYSQL_DB = os.environ.get('MYSQL_DB', 'positiva_pos')
 
     # Detectar URL explícita o construir URL de MySQL / SQLite
-    default_sqlite_path = os.path.join(_BACKEND_DIR, 'sistema_pos_pwa.db')
+    legacy_sqlite_path = os.path.join(_BACKEND_DIR, 'sistema_pos_pwa.db')
+    default_sqlite_path = os.path.join(_BACKEND_DIR, 'positiva_pos.db')
+    if not os.path.exists(default_sqlite_path) and os.path.exists(legacy_sqlite_path):
+        default_sqlite_path = legacy_sqlite_path
     DATABASE_URL = os.environ.get('DATABASE_URL')
     
     if not DATABASE_URL:

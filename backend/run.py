@@ -168,7 +168,7 @@ if __name__ == '__main__':
     # SEGURIDAD (C1): El depurador de Werkzeug permite ejecución remota de código.
     # Solo se activa explícitamente con FLASK_DEBUG=1 (nunca con túneles o red pública).
     debug_mode = os.environ.get('FLASK_DEBUG', '0') == '1'
-    print(f"[START] SISTEMA POS PWA escuchando en http://{host}:{port}")
+    print(f"[START] Positiva-POS escuchando en http://{host}:{port}")
     print(f"[APP]   Abrir en el navegador: http://localhost:{port}/")
     if debug_mode:
         print("[WARN]  Modo DEBUG activo: no exponga este servidor a la red.")

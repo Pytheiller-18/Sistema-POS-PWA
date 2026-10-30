@@ -1,6 +1,6 @@
-# SISTEMA POS PWA
+# Positiva-POS
 
-> **Sistema de Punto de Venta (POS) Ligero, Multi-Tenant y Offline-First con Arquitectura PWA y Sincronización en la Nube.**
+> **Positiva-POS: Sistema de Punto de Venta (POS) Ligero, Multi-Tenant y Offline-First con Arquitectura PWA y Sincronización en la Nube.**
 
 [![Python](https://img.shields.io/badge/Python-3.13+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
 [![Flask](https://img.shields.io/badge/Flask-3.1.3-000000?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
@@ -12,7 +12,7 @@
 
 ## 📌 Descripción del Proyecto
 
-**SISTEMA POS PWA** es una solución integral de Punto de Venta diseñada bajo el paradigma **Local-First / Offline-First**, garantizando que una tienda o comercio minorista pueda continuar operando y facturando ventas aún cuando la conexión a internet sea inestable o inexistente. Al restablecerse la red, las transacciones se sincronizan de manera transparente e idempotente con el servidor central.
+**Positiva-POS** es una solución integral de Punto de Venta diseñada bajo el paradigma **Local-First / Offline-First**, garantizando que una tienda o comercio minorista pueda continuar operando y facturando ventas aún cuando la conexión a internet sea inestable o inexistente. Al restablecerse la red, las transacciones se sincronizan de manera transparente e idempotente con el servidor central.
 
 ### 🌟 Pilares y Capacidades Clave
 
@@ -48,7 +48,7 @@
 El proyecto se encuentra desacoplado en dos módulos principales:
 
 ```text
-SISTEMA-POS-PWA/
+Positiva-POS/
 ├── backend/                                   # Capa de API RESTful, Lógica de Negocio y Persistencia
 │   ├── app/
 │   │   ├── __init__.py                        # Fábrica de aplicaciones Flask y registro de rutas

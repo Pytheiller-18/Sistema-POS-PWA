@@ -1,13 +1,13 @@
 -- =====================================================================
--- SISTEMA POS PWA - DDL SCHEMA (MySQL 8.0+)
+-- Positiva-POS - DDL SCHEMA (MySQL 8.0+)
 -- Arquitectura Multi-Tenant SaaS con Soporte Offline-First e Idempotencia
 -- =====================================================================
 
-CREATE DATABASE IF NOT EXISTS `sistema_pos_pwa` 
+CREATE DATABASE IF NOT EXISTS `positiva_pos` 
   DEFAULT CHARACTER SET utf8mb4 
   COLLATE utf8mb4_unicode_ci;
 
-USE `sistema_pos_pwa`;
+USE `positiva_pos`;
 
 SET FOREIGN_KEY_CHECKS = 0;
 

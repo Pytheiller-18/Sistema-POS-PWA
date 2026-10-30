@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sistema-pos-pwa-v3';
+const CACHE_NAME = 'positiva-pos-v1';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -18,7 +18,7 @@ const STATIC_ASSETS = [
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('[SW] Pre-cacheando App Shell de SISTEMA POS PWA...');
+      console.log('[SW] Pre-cacheando App Shell de Positiva-POS...');
       return cache.addAll(STATIC_ASSETS);
     }).then(() => self.skipWaiting())
   );

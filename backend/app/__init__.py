@@ -8,7 +8,7 @@ FRONTEND_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..
 
 
 def create_app(config_class=Config):
-    """Fábrica de aplicaciones Flask para el SISTEMA POS PWA."""
+    """Fábrica de aplicaciones Flask para Positiva-POS."""
     app = Flask(__name__, static_folder=None)
     app.config.from_object(config_class)
 
@@ -34,7 +34,7 @@ def create_app(config_class=Config):
     def health_check():
         return jsonify({
             'status': 'healthy',
-            'system': 'SISTEMA POS PWA API',
+            'system': 'Positiva-POS API',
             'version': '1.1.0',
             'multi_tenant': True,
             'offline_first_ready': True
