@@ -1,11 +1,11 @@
-import uuid
 from datetime import datetime, timezone
 from app.extensions import db
+from app.utils.uuid7 import uuid7_str
 
 class User(db.Model):
     __tablename__ = 'users'
 
-    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    id = db.Column(db.String(36), primary_key=True, default=uuid7_str)
     tenant_id = db.Column(db.String(36), db.ForeignKey('tenants.id', ondelete='CASCADE'), nullable=False, index=True)
     full_name = db.Column(db.String(120), nullable=False)
     email = db.Column(db.String(120), nullable=False)

@@ -1,4 +1,3 @@
-import uuid
 from datetime import datetime, timezone
 from decimal import Decimal
 from flask import current_app
@@ -9,6 +8,7 @@ from app.models.product import Product
 from app.models.sale import Sale, SaleItem
 from app.models.sync_log import SyncAuditLog
 from app.utils.validators import ValidationError, to_decimal, to_int, clean_str, TWO_PLACES
+from app.utils.uuid7 import uuid7_str
 
 # ============================================================================
 # DOBLE VERIFICACIÓN DE SEGURIDAD - PROCESAMIENTO DE VENTAS:
@@ -132,7 +132,7 @@ def _persist_sale(tenant_id: str, user_id: str, client_sync_id: str, parsed: dic
         line_total = (unit_price * qty).quantize(TWO_PLACES)
         subtotal += line_total
         sale_items.append(SaleItem(
-            id=str(uuid.uuid4()),
+            id=uuid7_str(),
             tenant_id=tenant_id,
             product_id=product.id,
             product_name=product.name,
@@ -157,7 +157,7 @@ def _persist_sale(tenant_id: str, user_id: str, client_sync_id: str, parsed: dic
         product_map[pid].stock = Product.stock - qty
 
     sale = Sale(
-        id=str(uuid.uuid4()),
+        id=uuid7_str(),
         tenant_id=tenant_id,
         user_id=user_id,
         client_sync_id=client_sync_id,
@@ -178,7 +178,7 @@ def _persist_sale(tenant_id: str, user_id: str, client_sync_id: str, parsed: dic
         db.session.add(s_item)
 
     db.session.add(SyncAuditLog(
-        id=str(uuid.uuid4()),
+        id=uuid7_str(),
         tenant_id=tenant_id,
         client_sync_id=client_sync_id,
         device_id=parsed['device_id'],
@@ -198,7 +198,7 @@ def process_sale(tenant_id: str, user_id: str, data: dict, sync_status: str = 'O
     if not isinstance(data, dict):
         return {'success': False, 'error': 'Formato de venta inválido'}, 400
 
-    client_sync_id = str(data.get('client_sync_id') or uuid.uuid4())
+    client_sync_id = str(data.get('client_sync_id') or uuid7_str())
     if len(client_sync_id) > 64:
         return {'success': False, 'error': 'client_sync_id excede 64 caracteres'}, 400
 

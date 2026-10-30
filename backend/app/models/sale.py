@@ -1,11 +1,11 @@
-import uuid
 from datetime import datetime, timezone
 from app.extensions import db
+from app.utils.uuid7 import uuid7_str
 
 class Sale(db.Model):
     __tablename__ = 'sales'
 
-    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    id = db.Column(db.String(36), primary_key=True, default=uuid7_str)
     tenant_id = db.Column(db.String(36), db.ForeignKey('tenants.id', ondelete='CASCADE'), nullable=False, index=True)
     user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False, index=True)
     client_sync_id = db.Column(db.String(64), nullable=False) # Clave de idempotencia offline
@@ -56,7 +56,7 @@ class Sale(db.Model):
 class SaleItem(db.Model):
     __tablename__ = 'sale_items'
 
-    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    id = db.Column(db.String(36), primary_key=True, default=uuid7_str)
     tenant_id = db.Column(db.String(36), db.ForeignKey('tenants.id', ondelete='CASCADE'), nullable=False, index=True)
     sale_id = db.Column(db.String(36), db.ForeignKey('sales.id', ondelete='CASCADE'), nullable=False, index=True)
     product_id = db.Column(db.String(36), db.ForeignKey('products.id'), nullable=False, index=True)

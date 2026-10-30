@@ -13,6 +13,7 @@ from app.models.user import User
 from app.models.product import Category, Product
 from app.models.sale import Sale
 from app.middlewares.auth import hash_password, generate_jwt_token
+from app.utils.uuid7 import uuid7, uuid7_str, is_uuid7
 
 class TestConfig(Config):
     TESTING = True
@@ -29,7 +30,7 @@ class POSBackendTestCase(unittest.TestCase):
 
         # Tenant A (Tienda Alpha)
         self.tenant_a = Tenant(
-            id=str(uuid.uuid4()),
+            id=uuid7_str(),
             business_name="Tienda Alpha",
             tax_id="NIT-111",
             status="ACTIVE"
@@ -37,7 +38,7 @@ class POSBackendTestCase(unittest.TestCase):
         db.session.add(self.tenant_a)
 
         self.user_a_admin = User(
-            id=str(uuid.uuid4()),
+            id=uuid7_str(),
             tenant_id=self.tenant_a.id,
             full_name="Admin Alpha",
             email="admin@alpha.com",
@@ -49,7 +50,7 @@ class POSBackendTestCase(unittest.TestCase):
 
         # Tenant B (Tienda Beta - Aislada)
         self.tenant_b = Tenant(
-            id=str(uuid.uuid4()),
+            id=uuid7_str(),
             business_name="Tienda Beta",
             tax_id="NIT-222",
             status="ACTIVE"
@@ -57,7 +58,7 @@ class POSBackendTestCase(unittest.TestCase):
         db.session.add(self.tenant_b)
 
         self.user_b_admin = User(
-            id=str(uuid.uuid4()),
+            id=uuid7_str(),
             tenant_id=self.tenant_b.id,
             full_name="Admin Beta",
             email="admin@beta.com",
@@ -69,7 +70,7 @@ class POSBackendTestCase(unittest.TestCase):
 
         # Producto de Tenant A
         self.product_a = Product(
-            id=str(uuid.uuid4()),
+            id=uuid7_str(),
             tenant_id=self.tenant_a.id,
             barcode="77000000001",
             name="Café Gourmet Alpha 500g",
@@ -83,7 +84,7 @@ class POSBackendTestCase(unittest.TestCase):
 
         # Producto de Tenant B
         self.product_b = Product(
-            id=str(uuid.uuid4()),
+            id=uuid7_str(),
             tenant_id=self.tenant_b.id,
             barcode="77000000002",
             name="Té Especial Beta",
@@ -128,7 +129,7 @@ class POSBackendTestCase(unittest.TestCase):
         """Doble Verificación: Registrar venta disminuye stock y calcula contabilidad."""
         headers_a = {'Authorization': f'Bearer {self.token_a}'}
         sale_payload = {
-            'client_sync_id': str(uuid.uuid4()),
+            'client_sync_id': uuid7_str(),
             'payment_method': 'CASH',
             'amount_paid': 50.0,
             'items': [
@@ -201,7 +202,7 @@ class POSBackendTestCase(unittest.TestCase):
         
         # Registrar una venta de 4 unidades: Precio 18 c/u (Total 72), Costo 10 c/u (Costo Total 40), Ganancia 32
         sale_payload = {
-            'client_sync_id': str(uuid.uuid4()),
+            'client_sync_id': uuid7_str(),
             'items': [{'product_id': self.product_a.id, 'quantity': 4}]
         }
         self.client.post('/api/v1/sales', json=sale_payload, headers=headers_a)
@@ -227,7 +228,7 @@ class POSBackendTestCase(unittest.TestCase):
         initial_stock = self.product_a.stock
 
         sale_payload = {
-            'client_sync_id': str(uuid.uuid4()),
+            'client_sync_id': uuid7_str(),
             'items': [
                 {'product_id': self.product_a.id, 'quantity': 5},
                 {'product_id': 'invalid-product-uuid', 'quantity': 1}
@@ -263,6 +264,47 @@ class POSBackendTestCase(unittest.TestCase):
 
         res = self.client.get('/api/v1/products', headers=headers_a)
         self.assertEqual(res.status_code, 401, "Token de usuario inactivo debe ser rechazado inmediatamente")
+
+    def test_uuid7_compliance_and_monotonicity(self):
+        """Valida que UUIDv7 cumple RFC 9562 (versión 7, variante RFC 4122 y orden temporal monotónico)."""
+        import time
+
+        u1 = uuid7()
+        time.sleep(0.002)
+        u2 = uuid7()
+        time.sleep(0.002)
+        u3 = uuid7()
+
+        # Versión y variante
+        self.assertEqual(u1.version, 7)
+        self.assertEqual(u2.version, 7)
+        self.assertEqual(u3.version, 7)
+        self.assertEqual(u1.variant, uuid.RFC_4122)
+
+        # Validación por función helper
+        self.assertTrue(is_uuid7(str(u1)))
+        self.assertTrue(is_uuid7(uuid7_str()))
+        self.assertFalse(is_uuid7(str(uuid.uuid4())))
+        self.assertFalse(is_uuid7('not-a-uuid'))
+
+        # Orden cronológico / lexicográfico estricto
+        self.assertLess(str(u1), str(u2))
+        self.assertLess(str(u2), str(u3))
+
+    def test_models_auto_generate_uuid7(self):
+        """Valida que los modelos de la base de datos asignan UUIDv7 por defecto en su clave primaria."""
+        new_prod = Product(
+            tenant_id=self.tenant_a.id,
+            name="Producto UUIDv7 Auto",
+            sale_price=50.0,
+            cost_price=30.0,
+            stock=10
+        )
+        db.session.add(new_prod)
+        db.session.commit()
+
+        self.assertIsNotNone(new_prod.id)
+        self.assertTrue(is_uuid7(new_prod.id), f"El ID asignado ({new_prod.id}) debe ser un UUIDv7 válido")
 
 if __name__ == '__main__':
     unittest.main()

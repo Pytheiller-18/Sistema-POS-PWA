@@ -41,6 +41,30 @@ class PosApp {
       .replace(/'/g, '&#039;');
   }
 
+  // Generador UUIDv7 (RFC 9562) para ordenación cronológica e idempotencia
+  generateUUIDv7() {
+    const now = BigInt(Date.now());
+    const bytes = new Uint8Array(16);
+    if (window.crypto && window.crypto.getRandomValues) {
+      window.crypto.getRandomValues(bytes);
+    } else {
+      for (let i = 0; i < 16; i++) bytes[i] = Math.floor(Math.random() * 256);
+    }
+    // 48 bits de marca de tiempo (milisegundos) en big-endian
+    bytes[0] = Number((now >> 40n) & 0xffn);
+    bytes[1] = Number((now >> 32n) & 0xffn);
+    bytes[2] = Number((now >> 24n) & 0xffn);
+    bytes[3] = Number((now >> 16n) & 0xffn);
+    bytes[4] = Number((now >> 8n) & 0xffn);
+    bytes[5] = Number(now & 0xffn);
+    // Versión 7 (0b0111xxxx)
+    bytes[6] = 0x70 | (bytes[6] & 0x0f);
+    // Variante RFC 4122 (10xxxxxx)
+    bytes[8] = 0x80 | (bytes[8] & 0x3f);
+    const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+    return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+  }
+
   formatMoney(amount) {
     return '$' + Number(amount || 0).toLocaleString('es-CO', { maximumFractionDigits: 0 });
   }
@@ -705,7 +729,7 @@ class PosApp {
       confirmBtn.textContent = 'Procesando venta...';
     }
 
-    const clientSyncId = 'pos-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+    const clientSyncId = this.generateUUIDv7();
     const invoiceNumber = 'POS-' + new Date().getFullYear() + '-' + Math.floor(100000 + Math.random() * 900000);
     const currentTenant = window.apiClient.tenant;
 

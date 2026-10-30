@@ -1,6 +1,5 @@
 import os
 import sys
-import uuid
 
 # Asegurar codificación UTF-8 en salida de consola Windows
 if hasattr(sys.stdout, 'reconfigure'):
@@ -15,6 +14,7 @@ from app.models.tenant import Tenant
 from app.models.user import User
 from app.models.product import Category, Product
 from app.middlewares.auth import hash_password
+from app.utils.uuid7 import uuid7_str
 
 app = create_app()
 
@@ -28,7 +28,7 @@ def seed_demo_data():
             print("[+] Inicializando datos semilla para demostracion...")
 
             # 1. Crear Tenant demo
-            demo_tenant_id = str(uuid.uuid4())
+            demo_tenant_id = uuid7_str()
             tenant = Tenant(
                 id=demo_tenant_id,
                 business_name="Supermercado & Tienda Demo",
@@ -43,7 +43,7 @@ def seed_demo_data():
 
             # 2. Crear Usuarios (Admin y Cajero)
             admin_user = User(
-                id=str(uuid.uuid4()),
+                id=uuid7_str(),
                 tenant_id=demo_tenant_id,
                 full_name="Administrador Principal",
                 email="admin@pos.com",
@@ -54,7 +54,7 @@ def seed_demo_data():
             db.session.add(admin_user)
 
             cashier_user = User(
-                id=str(uuid.uuid4()),
+                id=uuid7_str(),
                 tenant_id=demo_tenant_id,
                 full_name="Cajero de Turno",
                 email="cajero@pos.com",
@@ -66,19 +66,19 @@ def seed_demo_data():
 
             # 3. Crear Categorías
             cat_bebidas = Category(
-                id=str(uuid.uuid4()),
+                id=uuid7_str(),
                 tenant_id=demo_tenant_id,
                 name="Bebidas y Refrescos",
                 description="Gaseosas, jugos, aguas y energizantes"
             )
             cat_snacks = Category(
-                id=str(uuid.uuid4()),
+                id=uuid7_str(),
                 tenant_id=demo_tenant_id,
                 name="Snacks y Pasabocas",
                 description="Papas fritas, galletas y chocolates"
             )
             cat_lacteos = Category(
-                id=str(uuid.uuid4()),
+                id=uuid7_str(),
                 tenant_id=demo_tenant_id,
                 name="Lácteos y Derivados",
                 description="Leche, quesos y yogures"
@@ -88,7 +88,7 @@ def seed_demo_data():
             # 4. Crear Productos
             sample_products = [
                 Product(
-                    id=str(uuid.uuid4()),
+                    id=uuid7_str(),
                     tenant_id=demo_tenant_id,
                     category=cat_bebidas,
                     barcode="770123456001",
@@ -99,7 +99,7 @@ def seed_demo_data():
                     min_stock=10
                 ),
                 Product(
-                    id=str(uuid.uuid4()),
+                    id=uuid7_str(),
                     tenant_id=demo_tenant_id,
                     category=cat_bebidas,
                     barcode="770123456002",
@@ -110,7 +110,7 @@ def seed_demo_data():
                     min_stock=8
                 ),
                 Product(
-                    id=str(uuid.uuid4()),
+                    id=uuid7_str(),
                     tenant_id=demo_tenant_id,
                     category=cat_snacks,
                     barcode="770123456003",
@@ -121,7 +121,7 @@ def seed_demo_data():
                     min_stock=5
                 ),
                 Product(
-                    id=str(uuid.uuid4()),
+                    id=uuid7_str(),
                     tenant_id=demo_tenant_id,
                     category=cat_snacks,
                     barcode="770123456004",
@@ -132,7 +132,7 @@ def seed_demo_data():
                     min_stock=12
                 ),
                 Product(
-                    id=str(uuid.uuid4()),
+                    id=uuid7_str(),
                     tenant_id=demo_tenant_id,
                     category=cat_lacteos,
                     barcode="770123456005",
@@ -143,7 +143,7 @@ def seed_demo_data():
                     min_stock=6
                 ),
                 Product(
-                    id=str(uuid.uuid4()),
+                    id=uuid7_str(),
                     tenant_id=demo_tenant_id,
                     category=cat_lacteos,
                     barcode="770123456006",

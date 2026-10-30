@@ -1,10 +1,10 @@
-import uuid
 from datetime import datetime, timezone
 from flask import Blueprint, request, jsonify, g
 from app.extensions import db
 from app.models.product import Product, Category
 from app.middlewares.auth import tenant_required
 from app.utils.validators import to_decimal, to_int, clean_str
+from app.utils.uuid7 import uuid7_str
 
 MAX_PRICE = 999_999_999
 MAX_STOCK = 10_000_000
@@ -111,7 +111,7 @@ def create_product():
             return jsonify({'success': False, 'error': 'La categoría seleccionada no existe'}), 404
 
     product = Product(
-        id=str(uuid.uuid4()),
+        id=uuid7_str(),
         tenant_id=g.tenant_id,
         category_id=category_id,
         barcode=barcode,
@@ -212,7 +212,7 @@ def create_category():
         return jsonify({'success': False, 'error': 'El nombre de categoría es obligatorio'}), 400
 
     category = Category(
-        id=str(uuid.uuid4()),
+        id=uuid7_str(),
         tenant_id=g.tenant_id,
         name=name,
         description=clean_str(data.get('description'), 'description', 255),

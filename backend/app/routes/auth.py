@@ -1,4 +1,3 @@
-import uuid
 from flask import Blueprint, request, jsonify, g, current_app
 from sqlalchemy.exc import IntegrityError
 from app.extensions import db
@@ -6,6 +5,7 @@ from app.models.tenant import Tenant
 from app.models.user import User
 from app.middlewares.auth import hash_password, verify_password, generate_jwt_token, tenant_required
 from app.utils.validators import clean_str, ValidationError, login_limiter
+from app.utils.uuid7 import uuid7_str
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/api/v1/auth')
 
@@ -62,7 +62,7 @@ def register_tenant():
         }), 409
 
     try:
-        tenant_id = str(uuid.uuid4())
+        tenant_id = uuid7_str()
         tenant = Tenant(
             id=tenant_id,
             business_name=business_name,
@@ -75,7 +75,7 @@ def register_tenant():
         db.session.add(tenant)
 
         user = User(
-            id=str(uuid.uuid4()),
+            id=uuid7_str(),
             tenant_id=tenant_id,
             full_name=full_name,
             email=email,
@@ -210,7 +210,7 @@ def create_user():
         return jsonify({'success': False, 'error': 'El correo electrónico ya está registrado'}), 409
 
     user = User(
-        id=str(uuid.uuid4()),
+        id=uuid7_str(),
         tenant_id=g.tenant_id,
         full_name=full_name,
         email=email,

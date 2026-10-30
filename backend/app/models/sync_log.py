@@ -1,11 +1,11 @@
-import uuid
 from datetime import datetime, timezone
 from app.extensions import db
+from app.utils.uuid7 import uuid7_str
 
 class SyncAuditLog(db.Model):
     __tablename__ = 'sync_audit_log'
 
-    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    id = db.Column(db.String(36), primary_key=True, default=uuid7_str)
     tenant_id = db.Column(db.String(36), db.ForeignKey('tenants.id', ondelete='CASCADE'), nullable=False, index=True)
     client_sync_id = db.Column(db.String(64), nullable=False)
     device_id = db.Column(db.String(100), nullable=True)

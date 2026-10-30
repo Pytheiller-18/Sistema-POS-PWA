@@ -1,11 +1,11 @@
-import uuid
 from datetime import datetime, timezone
 from app.extensions import db
+from app.utils.uuid7 import uuid7_str
 
 class Category(db.Model):
     __tablename__ = 'categories'
 
-    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    id = db.Column(db.String(36), primary_key=True, default=uuid7_str)
     tenant_id = db.Column(db.String(36), db.ForeignKey('tenants.id', ondelete='CASCADE'), nullable=False, index=True)
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String(255), nullable=True)
@@ -27,7 +27,7 @@ class Category(db.Model):
 class Product(db.Model):
     __tablename__ = 'products'
 
-    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    id = db.Column(db.String(36), primary_key=True, default=uuid7_str)
     tenant_id = db.Column(db.String(36), db.ForeignKey('tenants.id', ondelete='CASCADE'), nullable=False, index=True)
     category_id = db.Column(db.String(36), db.ForeignKey('categories.id', ondelete='SET NULL'), nullable=True, index=True)
     barcode = db.Column(db.String(64), nullable=True)

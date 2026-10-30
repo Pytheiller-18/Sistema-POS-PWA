@@ -1,11 +1,11 @@
-import uuid
 from datetime import datetime, timezone
 from app.extensions import db
+from app.utils.uuid7 import uuid7_str
 
 class Tenant(db.Model):
     __tablename__ = 'tenants'
 
-    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    id = db.Column(db.String(36), primary_key=True, default=uuid7_str)
     business_name = db.Column(db.String(150), nullable=False)
     tax_id = db.Column(db.String(50), nullable=True) # NIT / RUC / RFC / CIF
     phone = db.Column(db.String(30), nullable=True)
