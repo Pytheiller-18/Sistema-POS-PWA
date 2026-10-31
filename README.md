@@ -2,6 +2,10 @@
 
 > **Positiva-POS: Sistema de Punto de Venta (POS) Ligero, Multi-Tenant y Offline-First con Arquitectura PWA y Sincronización en la Nube.**
 
+> [!NOTE]
+> **Estado del Proyecto:** Positiva-POS se encuentra actualmente en **estado de desarrollo** (Work in Progress / Beta activa). Nuevas características, mejoras y ajustes de estabilidad se incorporan continuamente.
+
+[![Estado](https://img.shields.io/badge/Estado-En%20Desarrollo-orange?style=for-the-badge)](https://github.com/)
 [![Python](https://img.shields.io/badge/Python-3.13+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
 [![Flask](https://img.shields.io/badge/Flask-3.1.3-000000?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0+-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
